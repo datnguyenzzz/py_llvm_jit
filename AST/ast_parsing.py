@@ -23,7 +23,8 @@ def ast_tree(node):
 def format_ast(node, **kws):
     return pprint.pformat(ast_tree(node,), **kws)
 
-def dump(node):
+def dump(source):
+    node = ast.parse(source) 
     return format_ast(node)
 
 if __name__ == "__main__":
