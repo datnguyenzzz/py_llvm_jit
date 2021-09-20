@@ -28,7 +28,8 @@ def dump(source):
     return format_ast(node)
 
 if __name__ == "__main__":
-    source = """a = 2"""
+    source = """if a < b:
+                    a = b"""
     #source = """def f(x):
     #                return x"""
 
