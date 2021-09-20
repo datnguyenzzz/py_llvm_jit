@@ -79,10 +79,46 @@ class BinOp(ast.AST):
     def right(self):
         return self._right
     
-    @op.setter 
+    @right.setter 
     def right(self,n_right):
         self._right = n_right
     
     @property
     def fields(self):
         return self._fields
+
+class Call(ast.AST):
+    def __init__(self, func, args, keywords):
+        self._func = func 
+        self._args = args 
+        self._keywords = keywords 
+        self._fields = ["func", "args", "keywords"]
+    
+    @property
+    def func(self):
+        return self._func
+    
+    @func.setter 
+    def func(self,n_func):
+        self._func = n_func 
+    
+    @property
+    def args(self):
+        return self._args
+    
+    @args.setter 
+    def args(self,n_args):
+        self._args = n_args 
+    
+    @property
+    def keywords(self):
+        return self._keywords
+    
+    @keywords.setter 
+    def keywords(self,n_keywords):
+        self._keywords = n_keywords
+    
+    @property
+    def fields(self):
+        return self._fields
+
