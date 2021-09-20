@@ -28,8 +28,7 @@ def dump(source):
     return format_ast(node)
 
 if __name__ == "__main__":
-    source = """if a < b:
-                    a = b"""
+    source = """lambda x : x * 2"""
     #source = """def f(x):
     #                return x"""
 
