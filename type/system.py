@@ -6,6 +6,19 @@
 #  | [t] -> t     (Function type)                   #
 #####################################################
 
+class Variable(object):
+    def __init__(self, s):
+        self._s = s 
+
+    def __eq__(self, other):
+        if isinstance(other, Variable):
+            return self._s == other._s 
+        else:
+            return False
+    
+    def __repr__(self):
+        return self._s 
+
 class Constructor(object):
     def __init__(self, s):
         self._s = s 
