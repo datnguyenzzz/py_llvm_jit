@@ -1,5 +1,10 @@
 import ast 
 
+ops = {ast.Add: "#add", ast.Sub: "#sub", ast.mult: "#mult",
+       ast.Div: "#div", ast.Mod: "#mod", ast.Pow: "#pow",
+       ast.LShift: "#l_shift", ast.RShift: "#r_shift",
+       ast.BitOr: "#or", ast.BitAnd: "#and", ast.BitXor: "#xor"}
+
 class UnaryOp(ast.AST):
     def __init__(self, op, operand):
         self._op = op 
@@ -121,4 +126,5 @@ class Call(ast.AST):
     @property
     def fields(self):
         return self._fields
+
 
