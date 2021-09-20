@@ -28,7 +28,7 @@ def dump(source):
     return format_ast(node)
 
 if __name__ == "__main__":
-    source = """f(a, b=c, *d)"""
+    source = """{"a" : "z"}"""
     #source = """def f(x):
     #                return x"""
 
