@@ -36,7 +36,7 @@ class Subscript(ast.AST):
         return self._fields
 
 class Slice(ast.AST):
-    def __init__(self, lower, upper, step=None):
+    def __init__(self, lower, upper, step):
         self._lower = lower 
         self._upper = upper 
         self._step = step

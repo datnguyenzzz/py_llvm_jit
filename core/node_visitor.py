@@ -1,9 +1,10 @@
-#Tranform AST node to defined core language
+#AST Node traverse
 
 import ast 
 
 class Visitor(ast.NodeVisitor):
-    pass 
+    def __init__(self):
+        pass  
 
 if __name__ == "__main__":
     pass
