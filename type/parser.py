@@ -18,11 +18,11 @@ from core.statements import *
 from core.subscripting import * 
 from core.variables import *
 
-class Tranformer(Visitor):
+class Parser(Visitor):
 
     #ast.NodeVisitor.visit(node) --> self.visit_classname() 
 
-    def __call__(self, source):
+    def __init__(self, source):
         if isinstance(source, types.ModuleType) or \
            isinstance(source, types.FunctionType) or \
            isinstance(source, types.LambdaType):
@@ -34,7 +34,15 @@ class Tranformer(Visitor):
 
         self._source = source 
         self._ast = ast.parse(source)
-        return self.visit(self._ast)
+        self._syntax_tree = self.visit(self._ast)
+    
+    @property 
+    def syntax_tree(self):
+        return self._syntax_tree 
+    
+    @syntax_tree.setter 
+    def syntax_tree(self, n_tree):
+        self._syntax_tree = n_tree
     
     def visit_Module(self,node):
         body = list(map(self.visit, list(node.body)))
@@ -126,19 +134,19 @@ class Tranformer(Visitor):
             return Assign(target, BinOp(target, op, value))
         else:
             raise TypeError("Doesn't support and=")
+
+    def visit_For(self, node):
+        print(ast.dump(node)) 
+
+    def visit_While(self, node):
+        pass
     
 if __name__ == "__main__":
     def test_func(x,y):
-        #a,b,c,d = 2,3,4,5
-        #a = 10 and 3
-        #b = 4 
-        tmp = x | y 
-        tmp += 10
-        tmp *= 20 
-        tmp |= 10 
-        tmp ^= 1
-        tmp >>= 1
+        tmp = 0 
+        for i in range(10):
+            tmp += i
         return tmp
 
-    tranform = Tranformer()
-    print(tranform(test_func))
+    parser = Parser(test_func)
+    print(parser.syntax_tree)
