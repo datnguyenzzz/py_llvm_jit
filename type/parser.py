@@ -64,12 +64,14 @@ class Parser(Visitor):
     def visit_Tuple(self, node):
         #print("* Tuple *",node.elts)
         elts = list(map(self.visit, node.elts))
-        return elts
+        ctx = context[node.ctx.__class__]
+        return Tuple(elts,ctx)
     
     def visit_List(self, node):
-        #print("* List *",node.elts)
+        #print("* List *",ast.dump(node))
         elts = list(map(self.visit, node.elts))
-        return elts
+        ctx = context[node.ctx.__class__]
+        return List(elts,ctx)
     
     def visit_Num(self, node):
         n = node.n 
@@ -108,7 +110,7 @@ class Parser(Visitor):
 
     def visit_FunctionDef(self, node):
         #name, args, body, decorators_list, returns
-        #print("* funcdef *", node.returns)
+        #print("* funcdef *", ast.dump(node))
         name = node.name
         args = self.visit(node.args)
 
@@ -117,7 +119,6 @@ class Parser(Visitor):
         #still doesn't support decorator 
         decorator_list = node.decorator_list 
         returns = node.returns
-
         func = FunctionDef(name, args, body, decorator_list, returns)
         return func
     
@@ -163,14 +164,29 @@ class Parser(Visitor):
         comparators = list(map(self.visit, node.comparators)) 
         return Compare(left, op, comparators)
     
+    def visit_Subscript(self, node):
+        #print(ast.dump(node))
+        value = self.visit(node.value)
+        slices = self.visit(node.slice)
+        ctx = context[node.ctx.__class__]
+        return Subscript(ctx, value, slices)
+    
+    def visit_Slice(self, node):
+        #print(ast.dump(node))
+        lower = self.visit(node.lower) 
+        upper = self.visit(node.upper)
+        if node.step is not None:
+            step = self.visit(node.step) 
+        else:
+            step = Int(1) 
+        return Slice(lower,upper,step)
+
+    
 if __name__ == "__main__":
     def test_func(x,y):
-        i,t = 0,0 
-        while i < 10:
-            t += i 
-            i += 1 
-        
-        return t
+        a = [1,2,3,3,4,4,5]
+        a = a[1:4:3]
+        return a
 
     parser = Parser(test_func)
     print(parser.syntax_tree)
