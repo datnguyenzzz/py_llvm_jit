@@ -38,7 +38,7 @@ class Tranformer(Visitor):
     
     def visit_Module(self,node):
         body = list(map(self.visit, list(node.body)))
-        return body[0]
+        return body
     
     def visit_arg(self, node):
         #print("* arg *",node.arg)
@@ -46,21 +46,48 @@ class Tranformer(Visitor):
     
     def visit_arguments(self, node):
         #print("* args *",node.args)
-        args = list(map(self.visit, list(node.args)))
+        args = list(map(self.visit, node.args))
         return args
+
+    def visit_Name(self, node):
+        return Var(node.id)
+    
+    def visit_Tuple(self, node):
+        #print("* Tuple *",node.elts)
+        elts = list(map(self.visit, node.elts))
+        return elts
+
+    def visit_Assign(self, node):
+        #targets , values
+        #targets = name, tuple, list
+        targets = self.visit(node.targets[0]) 
+        return targets
+
+    def visit_Return(self, node):
+        #print("* Return *",node.value)
+        value = self.visit(node.value)
+        return value
 
     def visit_FunctionDef(self, node):
         #name, args, body, decorators_list, returns
-        print("* funcdef *", ast.dump(node.args))
+        #print("* funcdef *", node.returns)
         name = node.name
         args = self.visit(node.args)
+
+        body = list(map(self.visit, node.body))
         
-        #body = list(map(self.visit, list(node.body))) 
-        
+        #still doesn't support decorator 
+        decorator_list = node.decorator_list 
+        returns = node.returns
+
+        func = FunctionDef(name, args, body, decorator_list, returns)
+        return func
     
 if __name__ == "__main__":
     def test_func(x,y):
-        return x * y
+        a,b,c,d = 2,3,4,5
+        tmp = x * y
+        return tmp,a
 
     tranform = Tranformer()
     print(tranform(test_func))
