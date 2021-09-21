@@ -146,7 +146,10 @@ class Parser(Visitor):
 
     def visit_While(self, node):
         #test, body, orelse
-        print(ast.dump(node))
+        test = self.visit(node.test)
+        body = list(map(self.visit, node.body)) 
+        orelse = node.orelse 
+        return While(test, body, orelse)
 
     def visit_Call(self, node):
         func = self.visit(node.func)
@@ -155,12 +158,18 @@ class Parser(Visitor):
         return Call(func,args,keywords)
     
     def visit_Compare(self, node):
-        print(ast.dump(node))
+        left = self.visit(node.left)
+        op = [ops[o.__class__] for o in node.ops]
+        comparators = list(map(self.visit, node.comparators)) 
+        return Compare(left, op, comparators)
     
 if __name__ == "__main__":
     def test_func(x,y):
-        a = 10 
-        t = a < 20 
+        i,t = 0,0 
+        while i < 10:
+            t += i 
+            i += 1 
+        
         return t
 
     parser = Parser(test_func)
