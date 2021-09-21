@@ -3,7 +3,8 @@ import ast
 ops = {ast.Add: "#add", ast.Sub: "#sub", ast.Mult: "#mult",
        ast.Div: "#div", ast.Mod: "#mod", ast.Pow: "#pow",
        ast.LShift: "#l_shift", ast.RShift: "#r_shift",
-       ast.BitOr: "#or", ast.BitAnd: "#and", ast.BitXor: "#xor"}
+       ast.BitOr: "#bit_or", ast.BitAnd: "#bit_and", ast.BitXor: "#bit_xor",
+       ast.And: "#and", ast.Or: "#or", ast.Not: "#not"}
 
 class UnaryOp(ast.AST):
     def __init__(self, op, operand):
@@ -87,6 +88,32 @@ class BinOp(ast.AST):
     @right.setter 
     def right(self,n_right):
         self._right = n_right
+    
+    @property
+    def fields(self):
+        return self._fields
+
+class BoolOp(ast.AST):
+    def __init__(self, op, values):
+        self._op = op 
+        self._values = values 
+        self._fields = ["op", "values"]
+    
+    @property
+    def op(self):
+        return self._op 
+    
+    @op.setter 
+    def op(self,n_op):
+        self._op = n_op
+    
+    @property
+    def values(self):
+        return self._values
+    
+    @values.setter 
+    def values(self,n_values):
+        self._values = n_values
     
     @property
     def fields(self):

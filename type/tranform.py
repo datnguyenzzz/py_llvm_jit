@@ -56,12 +56,41 @@ class Tranformer(Visitor):
         #print("* Tuple *",node.elts)
         elts = list(map(self.visit, node.elts))
         return elts
+    
+    def visit_List(self, node):
+        #print("* List *",node.elts)
+        elts = list(map(self.visit, node.elts))
+        return elts
+    
+    def visit_Num(self, node):
+        n = node.n 
+        if isinstance(n,float):
+            return Float(n) 
+        else:
+            return Int(n) 
+    
+    def visit_Bool(self, node):
+        return Bool(node.n)
+
+    def visit_BoolOp(self, node):
+        op = ops[node.op.__class__]
+        values = list(map(self.visit, node.values)) 
+        return BoolOp(op,values)
+    
+    def visit_BinOp(self, node):
+        left = self.visit(node.left)
+        right = self.visit(node.right) 
+        op = ops[node.op.__class__] 
+
+        return BinOp(left, op, right)
 
     def visit_Assign(self, node):
-        #targets , values
+        #targets , value
         #targets = name, tuple, list
+        #print("* Assign *",node.value)
         targets = self.visit(node.targets[0]) 
-        return targets
+        value = self.visit(node.value)
+        return Assign(targets,value)
 
     def visit_Return(self, node):
         #print("* Return *",node.value)
@@ -85,9 +114,11 @@ class Tranformer(Visitor):
     
 if __name__ == "__main__":
     def test_func(x,y):
-        a,b,c,d = 2,3,4,5
+        #a,b,c,d = 2,3,4,5
+        #a = 10 and 3
+        #b = 4 
         tmp = x * y
-        return tmp,a
+        return 10
 
     tranform = Tranformer()
     print(tranform(test_func))
