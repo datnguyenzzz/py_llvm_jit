@@ -50,7 +50,8 @@ class Tranformer(Visitor):
         return args
 
     def visit_Name(self, node):
-        return Var(node.id)
+        ctx = context[node.ctx.__class__]
+        return Var(node.id, ctx)
     
     def visit_Tuple(self, node):
         #print("* Tuple *",node.elts)
@@ -112,13 +113,32 @@ class Tranformer(Visitor):
         func = FunctionDef(name, args, body, decorator_list, returns)
         return func
     
+    def visit_AugAssign(self, node):      
+        op = ops[node.op.__class__]
+        target = self.visit(node.target) 
+        value = self.visit(node.value)
+
+        if isinstance(node.op,ast.Add) or isinstance(node.op,ast.Sub) or \
+           isinstance(node.op,ast.Mult) or isinstance(node.op,ast.Div) or \
+           isinstance(node.op,ast.LShift) or isinstance(node.op,ast.RShift) or \
+           isinstance(node.op,ast.BitOr) or isinstance(node.op,ast.BitAnd) or \
+           isinstance(node.op,ast.BitXor) :
+            return Assign(target, BinOp(target, op, value))
+        else:
+            raise TypeError("Doesn't support and=")
+    
 if __name__ == "__main__":
     def test_func(x,y):
         #a,b,c,d = 2,3,4,5
         #a = 10 and 3
         #b = 4 
-        tmp = x * y
-        return 10
+        tmp = x | y 
+        tmp += 10
+        tmp *= 20 
+        tmp |= 10 
+        tmp ^= 1
+        tmp >>= 1
+        return tmp
 
     tranform = Tranformer()
     print(tranform(test_func))

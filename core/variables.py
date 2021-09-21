@@ -1,6 +1,8 @@
 #python Variables 
 import ast 
 
+context = {ast.Store : "#store", ast.Load : "#load", ast.Del : "#del"}
+
 class Var(ast.AST):
     #ctx: Load/Store/Del/Starred
     def __init__(self, id, ctx=None):
