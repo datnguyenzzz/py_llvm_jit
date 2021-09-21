@@ -21,7 +21,7 @@ def ast_tree(node):
     return _parse(node)
 
 def format_ast(node, **kws):
-    return pprint.pformat(ast_tree(node,), **kws)
+    return pprint.pformat(ast_tree(node), **kws)
 
 def dump(source):
     node = ast.parse(source) 

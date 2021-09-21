@@ -1,14 +1,22 @@
 import ast 
 
 class FunctionDef(ast.AST):
-    def __init__(self, args, body, decorator_list, returns, type_comment = None):
+    def __init__(self,name, args, body, decorator_list, returns, type_comment = None):
+        self._name = name
         self._args = args 
         self._body = body 
         self._decorator_list = decorator_list 
         self._returns = returns
         self._type_comment = type_comment
         self._fields = ["args", "body", "decorator_list", "returns", "type_comment"]
-        
+    @property
+    def name(self):
+        return self._name
+    
+    @name.setter 
+    def name(self,n_name):
+        self._name = n_name
+
     @property
     def args(self):
         return self._args 

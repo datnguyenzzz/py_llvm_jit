@@ -1,6 +1,6 @@
 import ast 
 
-ops = {ast.Add: "#add", ast.Sub: "#sub", ast.mult: "#mult",
+ops = {ast.Add: "#add", ast.Sub: "#sub", ast.Mult: "#mult",
        ast.Div: "#div", ast.Mod: "#mod", ast.Pow: "#pow",
        ast.LShift: "#l_shift", ast.RShift: "#r_shift",
        ast.BitOr: "#or", ast.BitAnd: "#and", ast.BitXor: "#xor"}
