@@ -130,23 +130,38 @@ class Parser(Visitor):
            isinstance(node.op,ast.Mult) or isinstance(node.op,ast.Div) or \
            isinstance(node.op,ast.LShift) or isinstance(node.op,ast.RShift) or \
            isinstance(node.op,ast.BitOr) or isinstance(node.op,ast.BitAnd) or \
-           isinstance(node.op,ast.BitXor) :
+           isinstance(node.op,ast.BitXor) or isinstance(node.op,ast.Pow) :
             return Assign(target, BinOp(target, op, value))
         else:
             raise TypeError("Doesn't support and=")
 
     def visit_For(self, node):
+        #target, iter, body, orelse
         print(ast.dump(node)) 
+        target = self.visit(node.target) 
+        iters = self.visit(node.iter)
+        body = list(map(self.visit, node.body)) 
+        orelse = node.orelse
+        return For(target,iters,body,orelse)
 
     def visit_While(self, node):
-        pass
+        #test, body, orelse
+        print(ast.dump(node))
+
+    def visit_Call(self, node):
+        func = self.visit(node.func)
+        args = list(map(self.visit, node.args)) 
+        keywords = node.keywords
+        return Call(func,args,keywords)
+    
+    def visit_Compare(self, node):
+        print(ast.dump(node))
     
 if __name__ == "__main__":
     def test_func(x,y):
-        tmp = 0 
-        for i in range(10):
-            tmp += i
-        return tmp
+        a = 10 
+        t = a < 20 
+        return t
 
     parser = Parser(test_func)
     print(parser.syntax_tree)

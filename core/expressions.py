@@ -4,7 +4,10 @@ ops = {ast.Add: "#add", ast.Sub: "#sub", ast.Mult: "#mult",
        ast.Div: "#div", ast.Mod: "#mod", ast.Pow: "#pow",
        ast.LShift: "#l_shift", ast.RShift: "#r_shift",
        ast.BitOr: "#bit_or", ast.BitAnd: "#bit_and", ast.BitXor: "#bit_xor",
-       ast.And: "#and", ast.Or: "#or", ast.Not: "#not"}
+       ast.And: "#and", ast.Or: "#or", ast.Not: "#not",
+       ast.Eq: "#=", ast.NotEq: "#!=", ast.Lt : "<", ast.LtE: "#<=",
+       ast.Gt: "#>", ast.GtE: "#>=", ast.Is : "#is", ast.IsNot: "#isnot",
+       ast.In: "#in", ast.NotIn: "#notin"}
 
 class UnaryOp(ast.AST):
     def __init__(self, op, operand):
@@ -153,5 +156,41 @@ class Call(ast.AST):
     @property
     def fields(self):
         return self._fields
+
+class Compare(ast.AST):
+    def __init__(self, left, ops, comparators):
+        self._left = left 
+        self._ops = ops 
+        self._comparators = comparators 
+        self._fields = ["left", "ops", "comparators"]
+    
+    @property
+    def left(self):
+        return self._left
+    
+    @left.setter 
+    def left(self,n_left):
+        self._left = n_left
+    
+    @property
+    def ops(self):
+        return self._ops
+    
+    @ops.setter 
+    def ops(self,n_ops):
+        self._ops = n_ops 
+    
+    @property
+    def comparators(self):
+        return self._comparators
+    
+    @comparators.setter 
+    def comparators(self,n_comparators):
+        self._comparators = n_comparators
+    
+    @property
+    def fields(self):
+        return self._fields
+
 
 
