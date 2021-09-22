@@ -23,6 +23,7 @@ def set_name():
 class TypeInference(object):
     def __init__(self,node):
         self._names = set_name() 
+        self._equal_relation = []
         self._cache = {}
         self._syntax_tree = self.visit(node)
     
@@ -51,16 +52,41 @@ class TypeInference(object):
         else:
             if node.id in self._cache:
                 node.dtype = self._cache[node.id] 
-        
+        print("* var *", vars(node))
         return node
+    
+    def visit_Int(self, node, attrs = None):
+        node.dtype = self.get_name() 
+        return node.dtype
+    
+    def visit_Float(self, node, attrs = None):
+        node.dtype = self.get_name() 
+        return node.dtype
+ 
+    def visit_Assign(self, node, attrs = None):
+        #Int/Float --> $ptr
+        dtype_value = self.visit(node.value)
+        
+        targets = self.visit(node.targets) 
+        if targets.id in self._cache:
+            # y = x , x = $ptr => y = $ptr
+            self._equal_relation.append((dtype_value, self._cache[targets.id])) 
+        
+        self._cache[targets.id] = dtype_value
+
+        _ = self.visit(node.targets, dtype_value)
+        return None
     
     def visit_FunctionDef(self, node, attrs = None):
         type_args = [self.get_name() for _ in node.args] 
         type_ret = TVar("$ret")
 
         for (arg, type_arg) in zip(node.args, type_args):
-            self.visit(arg, type_arg)
+            _ = self.visit(arg, type_arg)
         
+        _ = list(map(self.visit, node.body)) 
+
+        return TFunc(type_args, type_ret)
 
     def visit_generic(self,node):
         return NotImplementedError

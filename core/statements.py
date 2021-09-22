@@ -5,7 +5,7 @@ class Assign(ast.AST):
         self._targets = targets 
         self._value = value 
         self._type_comment = type_comment 
-        self._fields = ["targets","value","type_comment"]
+        self._fields = ["targets","value","dtype","type_comment"]
     
     @property 
     def targets(self):

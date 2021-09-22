@@ -5,7 +5,7 @@ context = {ast.Store : "#store", ast.Load : "#load", ast.Del : "#del"}
 
 class Var(ast.AST):
     #ctx: Load/Store/Del/Starred
-    def __init__(self, id, dtype=None, ctx=None):
+    def __init__(self, id, ctx=None, dtype=None):
         self._id = id 
         self._ctx = ctx
         self._dtype = dtype
