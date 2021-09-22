@@ -6,12 +6,12 @@
 #  | [t] -> t     (Function type)                   #
 #####################################################
 
-class Variable(object):
+class TVar(object):
     def __init__(self, s):
         self._s = s 
 
     def __eq__(self, other):
-        if isinstance(other, Variable):
+        if isinstance(other, TVar):
             return self._s == other._s 
         else:
             return False
@@ -19,12 +19,12 @@ class Variable(object):
     def __repr__(self):
         return self._s 
 
-class Constructor(object):
+class TCon(object):
     def __init__(self, s):
         self._s = s 
 
     def __eq__(self, other):
-        if isinstance(other, Constructor):
+        if isinstance(other, TCon):
             return self._s == other._s 
         else:
             return False
@@ -32,13 +32,13 @@ class Constructor(object):
     def __repr__(self):
         return self._s 
 
-class Application(object):
+class TApp(object):
     def __init__(self, a, b):
         self._a = a 
         self._b = b 
     
     def __eq__(self, other):
-        if isinstance(other, Application):
+        if isinstance(other, TApp):
             return self._a == other._a and self._b == other._b
         else:
             return False
@@ -46,13 +46,13 @@ class Application(object):
     def __repr__(self):
         return str(self._a) + " " + str(self._b)
     
-int32 = Constructor("Int32") 
-int64 = Constructor("Int64") 
-float32 = Constructor("Float")
-double64 = Constructor("Double")
-void = Constructor("Void")
+int32 = TCon("Int32") 
+int64 = TCon("Int64") 
+float32 = TCon("Float")
+double64 = TCon("Double")
+void = TCon("Void")
 
-array = lambda x: Application(Constructor("Array"), x) 
+array = lambda x: TApp(TCon("Array"), x) 
 array_int32 = array(int32) 
 array_int64 = array(int64) 
 array_double64 = array(double64)

@@ -1,6 +1,5 @@
-def f(n):
-    a = 0 
+def addup(n):
+    x = 1
     for i in range(n):
-        a += i 
-    
-    return a
+        n += 1 + x
+    return n
