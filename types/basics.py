@@ -45,6 +45,20 @@ class TApp(object):
     
     def __repr__(self):
         return str(self._a) + " " + str(self._b)
+
+class TFunc(object):
+    def __init__(self, args, ret):
+        self._args = args 
+        self._ret = ret
+    
+    def __eq__(self, other):
+        if isinstance(other, TApp):
+            return self._args == other._args and self._ret == other._ret
+        else:
+            return False
+    
+    def __repr__(self):
+        return str(self._args) + " -> " + str(self._ret)
     
 int32 = TCon("Int32") 
 int64 = TCon("Int64") 
