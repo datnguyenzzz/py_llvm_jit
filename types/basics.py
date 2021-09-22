@@ -1,7 +1,7 @@
 #####################################################
 #it takes a tuple of arguments to a single output.  #
 #t : a            (Type Variable)                   #
-#  | C {t}        (Named Constructor)               #
+#  | C(t)        (Named Constructor)               #
 #  | t            (Type Application)                #
 #  | [t] -> t     (Function type)                   #
 #####################################################

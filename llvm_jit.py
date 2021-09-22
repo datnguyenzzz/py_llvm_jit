@@ -6,7 +6,7 @@ import pprint
 import llvmlite.binding as llvm
 from llvmlite import ir
 
-from typo import parser
+from Parser import parser
 from AST import ast_parsing
 from utils import file_op
 
