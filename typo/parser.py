@@ -46,7 +46,7 @@ class Parser(Visitor):
     
     def visit_Module(self,node):
         body = list(map(self.visit, list(node.body)))
-        return body
+        return body[0]
     
     def visit_arg(self, node):
         #print("* arg *",node.arg)
@@ -106,7 +106,7 @@ class Parser(Visitor):
     def visit_Return(self, node):
         #print("* Return *",node.value)
         value = self.visit(node.value)
-        return value
+        return Return(value)
 
     def visit_FunctionDef(self, node):
         #name, args, body, decorators_list, returns
@@ -138,7 +138,7 @@ class Parser(Visitor):
 
     def visit_For(self, node):
         #target, iter, body, orelse
-        print(ast.dump(node)) 
+        #print(ast.dump(node)) 
         target = self.visit(node.target) 
         iters = self.visit(node.iter)
         body = list(map(self.visit, node.body)) 

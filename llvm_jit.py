@@ -1,10 +1,12 @@
 import sys 
 import os
 import argparse 
+import pprint
 
 import llvmlite.binding as llvm
 from llvmlite import ir
 
+from typo import parser
 from AST import ast_parsing
 from utils import file_op
 
@@ -17,9 +19,16 @@ def build_AST_tree(IN, OUT):
     else:
         file_op.write_to_file(OUT, ast_tree)
 
+def parsing(IN):
+    source = file_op.read_from_file(IN) 
+    parsed = parser.Parser(source) 
+    core = parsed.syntax_tree
+    print(ast_parsing.format_ast(core))
+
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser() 
     arg_parser.add_argument("--AST",required=False) 
+    arg_parser.add_argument("--parse", required=False)
     arg_parser.add_argument("--input", required=True)
     arg_parser.add_argument("--output",required=False)
     args = arg_parser.parse_args()
@@ -28,5 +37,8 @@ if __name__ == "__main__":
         FILENAME_IN = args.input
         FILENAME_OUT = args.output
         build_AST_tree(FILENAME_IN, FILENAME_OUT)
-      
+    
+    if args.parse == "True":
+        FILENAME_IN = args.input 
+        parsing(args.input)
 

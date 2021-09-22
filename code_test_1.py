@@ -1,5 +1,6 @@
-def f(x):
-    if x == 1:
-        return x
-    tmp = f(x-1) * x
-    return tmp
+def f(n):
+    a = 0 
+    for i in range(n):
+        a += i 
+    
+    return a

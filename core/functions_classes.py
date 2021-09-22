@@ -8,7 +8,7 @@ class FunctionDef(ast.AST):
         self._decorator_list = decorator_list 
         self._returns = returns
         self._type_comment = type_comment
-        self._fields = ["args", "body", "decorator_list", "returns", "type_comment"]
+        self._fields = ["name","args", "body", "decorator_list", "returns", "type_comment"]
     @property
     def name(self):
         return self._name
