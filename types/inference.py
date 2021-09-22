@@ -23,6 +23,7 @@ def set_name():
 class TypeInference(object):
     def __init__(self,node):
         self._names = set_name() 
+        self._cache = {}
         self._syntax_tree = self.visit(node)
     
     @property 
@@ -36,21 +37,36 @@ class TypeInference(object):
     def get_name(self):
         return TVar('$' + next(self._names)) 
     
-    def visit(self, node):
+    def visit(self, node, attrs = None):
         visit_name = f"visit_{type(node).__name__}" 
         if hasattr(self, visit_name):
-            return getattr(self, visit_name)(node) 
+            return getattr(self, visit_name)(node, attrs) 
         else:
             return self.visit_generic(node)
+
+    def visit_Var(self, node, dtype = None):
+        if dtype is not None:
+            node.dtype = dtype 
+            self._cache[node.id] = dtype
+        else:
+            if node.id in self._cache:
+                node.dtype = self._cache[node.id] 
+        
+        return node
     
-    def visit_FunctionDef(self, node):
-        print(node.args)
+    def visit_FunctionDef(self, node, attrs = None):
+        type_args = [self.get_name() for _ in node.args] 
+        type_ret = TVar("$ret")
+
+        for (arg, type_arg) in zip(node.args, type_args):
+            self.visit(arg, type_arg)
+        
 
     def visit_generic(self,node):
         return NotImplementedError
     
 if __name__ == "__main__":
-    def addup(n):
+    def addup(n,a,b):
         x = 1
         for i in range(n):
             n += 1 + x
@@ -58,7 +74,6 @@ if __name__ == "__main__":
 
     parser_tree = Parser(addup) 
     node = parser_tree.syntax_tree 
-    print(vars(node))
     #inference node to type
     type_node = TypeInference(node)
     node = type_node.syntax_tree

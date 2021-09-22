@@ -49,7 +49,6 @@ class Parser(Visitor):
         return body[0]
     
     def visit_arg(self, node):
-        #print("* arg *",node.arg)
         return Var(node.arg)
     
     def visit_arguments(self, node):
@@ -184,8 +183,7 @@ class Parser(Visitor):
     
 if __name__ == "__main__":
     def test_func(x,y):
-        a = [1,2,3,3,4,4,5]
-        a = a[1:4:3]
+        a = 123
         return a
 
     parser = Parser(test_func)
