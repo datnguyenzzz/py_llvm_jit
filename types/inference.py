@@ -62,10 +62,10 @@ class TypeInference(object):
         return node.dtype
     
     def visit_List(self, node, attrs = None):
-        pass 
+        return array(int32) 
     
     def visit_Tuple(self, node, attrs = None):
-        pass
+        return array(int32)
     
     def visit_BinOp(self, node, attrs = None):
         #print("** BinOp **",vars(node))
@@ -116,14 +116,18 @@ class TypeInference(object):
     
     def visit_FunctionDef(self, node, attrs = None):
         type_args = self.visit_args(node.args)
-        type_ret = TVar("$ret")
         
-        _ = list(map(self.visit, node.body)) 
+        body = list(map(self.visit, node.body)) 
+        type_ret = body[-1]
 
         print("** cache **",self._cache)
         print("** relation **", self._equal_relation)
 
         return TFunc(type_args, type_ret)
+    
+    def visit_Return(self, node, attrs = None):
+        type_ret = self.visit(node.value)
+        return type_ret
 
     def visit_generic(self,node):
         return NotImplementedError
