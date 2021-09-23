@@ -50,7 +50,7 @@ class TypeInference(object):
             self._cache[node.id] = dtype
         
         node.dtype = self._cache[node.id] 
-        print("* var *", node , "\n" , vars(node))
+        print("** var **", node , "\n" , vars(node))
         return node.dtype
     
     def visit_Int(self, node, attrs = None):
@@ -60,9 +60,24 @@ class TypeInference(object):
     def visit_Float(self, node, attrs = None):
         node.dtype = self.get_name() 
         return node.dtype
+    
+    def visit_List(self, node, attrs = None):
+        pass 
+    
+    def visit_Tuple(self, node, attrs = None):
+        pass
+    
+    def visit_BinOp(self, node, attrs = None):
+        #print("** BinOp **",vars(node))
+        type_left = self.visit(node.left)
+        type_right = self.visit(node.right)
+        self._equal_relation.append((type_left, type_right)) 
+
+        return type_left
  
     def visit_Assign(self, node, attrs = None):
         #Int/Float --> $ptr
+        #node.value = Int/Float/Op
         dtype_value = self.visit(node.value)
         
         targets = node.targets
@@ -95,14 +110,18 @@ class TypeInference(object):
         
         self._equal_relation.append((for_id,int32)) 
         self._equal_relation.extend([(b,int32) for b in range_bounded])
-        print(self._equal_relation)
-        print(self._cache)
+        
+        _ = list(map(self.visit, node.body))
+        return None
     
     def visit_FunctionDef(self, node, attrs = None):
         type_args = self.visit_args(node.args)
         type_ret = TVar("$ret")
         
         _ = list(map(self.visit, node.body)) 
+
+        print("** cache **",self._cache)
+        print("** relation **", self._equal_relation)
 
         return TFunc(type_args, type_ret)
 
