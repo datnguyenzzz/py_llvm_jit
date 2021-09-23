@@ -170,15 +170,16 @@ class Parser(Visitor):
         return Subscript(ctx, value, slices)
     
     def visit_Index(self, node):
-        lower = self.visit(node.value)
-        upper = Int(lower.n + 1)
-        step = Int(1) 
-        return Slice(lower, upper, step)
+        index = self.visit(node.value)
+        return Index(index)
 
     def visit_Slice(self, node):
         #print(ast.dump(node))
-        lower = self.visit(node.lower) 
-        upper = self.visit(node.upper)
+        lower, upper = None, None 
+        if node.lower is not None:
+            lower = self.visit(node.lower) 
+        if node.upper is not None:
+            upper = self.visit(node.upper)
         if node.step is not None:
             step = self.visit(node.step) 
         else:

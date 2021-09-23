@@ -69,3 +69,20 @@ class Slice(ast.AST):
     @property
     def fields(self):
         return self._fields
+
+class Index(ast.AST):
+    def __init__(self, index):
+        self._index = index 
+        self._fields = ["index"]
+    
+    @property
+    def index(self):
+        return self._index
+    
+    @index.setter 
+    def index(self,n_index):
+        self._index = n_index
+    
+    @property
+    def fields(self):
+        return self._fields
