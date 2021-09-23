@@ -67,6 +67,9 @@ class TypeInference(object):
     def visit_Tuple(self, node, attrs = None):
         return array(int32)
     
+    def visit_Subscript(self, node, attrs = None):
+        print("** Subscript **",vars(node))
+    
     def visit_BinOp(self, node, attrs = None):
         #print("** BinOp **",vars(node))
         type_left = self.visit(node.left)
@@ -133,12 +136,13 @@ class TypeInference(object):
         return NotImplementedError
     
 if __name__ == "__main__":
-    def addup(n,a,b):
-        x = 1
-        a = 2
-        for i in range(a,n):
-            n += 1 + x
-        return n
+    def addup(a,b):
+        a = [1,2,3,4,5]
+        n = 5
+        tmp = 0
+        for i in range(n):
+            tmp += a[i]
+        return tmp
 
     parser_tree = Parser(addup) 
     node = parser_tree.syntax_tree 

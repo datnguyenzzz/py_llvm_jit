@@ -1,5 +1,4 @@
-def addup(n,a,b):
-    x = 1
-    for i in range(n):
-        n += 1 + x
-    return n
+def addup(a,b):
+    a = [1,2,3,4,5]
+    a = a[1]
+    return tmp

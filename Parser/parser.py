@@ -164,12 +164,17 @@ class Parser(Visitor):
         return Compare(left, op, comparators)
     
     def visit_Subscript(self, node):
-        #print(ast.dump(node))
         value = self.visit(node.value)
         slices = self.visit(node.slice)
         ctx = context[node.ctx.__class__]
         return Subscript(ctx, value, slices)
     
+    def visit_Index(self, node):
+        lower = self.visit(node.value)
+        upper = Int(lower.n + 1)
+        step = Int(1) 
+        return Slice(lower, upper, step)
+
     def visit_Slice(self, node):
         #print(ast.dump(node))
         lower = self.visit(node.lower) 

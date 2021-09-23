@@ -5,7 +5,7 @@ class Subscript(ast.AST):
         self._ctx = ctx 
         self._value = value 
         self._nslice = nslice
-        self._fields = ["ctx", "value", "slice"]
+        self._fields = ["ctx", "value", "nslice"]
     
     @property
     def ctx(self):
