@@ -3,10 +3,14 @@ import os
 import argparse 
 import pprint
 
+CURR = os.path.dirname(os.path.abspath(__file__)) 
+sys.path.append(CURR+"/custom_types")
+
 import llvmlite.binding as llvm
 from llvmlite import ir
 
 from Parser import parser
+from custom_types import inference
 from AST import ast_parsing
 from utils import file_op
 
@@ -23,7 +27,10 @@ def parsing(IN):
     source = file_op.read_from_file(IN) 
     parsed = parser.Parser(source) 
     core = parsed.syntax_tree
-    print(ast_parsing.format_ast(core))
+    #inference node to type
+    Tinfer = inference.TypeInference()
+    Tinfer(core)
+    print(ast_parsing.dump(core))
 
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser() 

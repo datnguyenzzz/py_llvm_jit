@@ -21,20 +21,14 @@ def set_name():
         k += 1
 
 class TypeInference(object):
-    def __init__(self,node):
+    def __init__(self):
         self._names = set_name() 
         self._equal_relation = []
         self._cache = {}
-        self._syntax_tree = self.visit(node)
     
-    @property 
-    def syntax_tree(self):
-        return self._syntax_tree 
-    
-    @syntax_tree.setter 
-    def syntax_tree(self, n_tree):
-        self._syntax_tree = n_tree
-    
+    def __call__(self, node):
+        self.visit(node)
+   
     def get_name(self):
         return TVar('$' + next(self._names)) 
     
@@ -50,7 +44,7 @@ class TypeInference(object):
             self._cache[node.id] = dtype
         
         node.dtype = self._cache[node.id] 
-        print("** var **", node , "\n" , vars(node))
+        #print("** var **", node , "\n" , vars(node))
         return node.dtype
     
     def visit_Int(self, node, attrs = None):
@@ -73,7 +67,10 @@ class TypeInference(object):
         type_arr = self.visit(node.value) 
         type_attr = self.visit(node.nslice) 
         self._equal_relation.append((type_arr, array(new_mem)))
-        self._equal_relation.append((type_attr, int32))
+        if isinstance(type_attr, list):
+            self._equal_relation.extend([(t, int32) for t in type_attr])
+        else:
+            self._equal_relation.append((type_attr, int32))
         return new_mem
 
     def visit_Index(self, node, attrs = None):
@@ -81,7 +78,12 @@ class TypeInference(object):
         return self.visit(node.index)
     
     def visit_Slice(self, node, attrs = None):
-        pass
+        type_attr = [] 
+        type_attr.append(self.visit(node.lower))
+        type_attr.append(self.visit(node.upper))
+        type_attr.append(self.visit(node.step))
+
+        return type_attr
     
     def visit_BinOp(self, node, attrs = None):
         #print("** BinOp **",node.right)
@@ -136,9 +138,8 @@ class TypeInference(object):
         body = list(map(self.visit, node.body)) 
         type_ret = body[-1]
 
-        print("** cache **",self._cache)
-        print("** relation **", self._equal_relation)
-
+        #print("** cache **",self._cache)
+        #print("** relation **", self._equal_relation)
         return TFunc(type_args, type_ret)
     
     def visit_Return(self, node, attrs = None):
@@ -151,6 +152,7 @@ class TypeInference(object):
 if __name__ == "__main__":
     def addup(a,b):
         a = [1,2,3,4,5]
+        a = a[1:4:2]
         n = 5
         tmp = 0
         for i in range(n):
