@@ -68,10 +68,23 @@ class TypeInference(object):
         return array(int32)
     
     def visit_Subscript(self, node, attrs = None):
-        print("** Subscript **",vars(node))
+        #print("** Subscript **", vars(node))
+        new_mem = self.get_name()
+        type_arr = self.visit(node.value) 
+        type_attr = self.visit(node.nslice) 
+        self._equal_relation.append((type_arr, array(new_mem)))
+        self._equal_relation.append((type_attr, int32))
+        return new_mem
+
+    def visit_Index(self, node, attrs = None):
+        #print("** index **",vars(node))
+        return self.visit(node.index)
+    
+    def visit_Slice(self, node, attrs = None):
+        pass
     
     def visit_BinOp(self, node, attrs = None):
-        #print("** BinOp **",vars(node))
+        #print("** BinOp **",node.right)
         type_left = self.visit(node.left)
         type_right = self.visit(node.right)
         self._equal_relation.append((type_left, type_right)) 
