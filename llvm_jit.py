@@ -35,10 +35,11 @@ def parsing(IN):
 
     #Testing Tinfer attributes
     print(ast_parsing.dump(core))
+    print("******************************************")
     print("relations = ",Tinfer.relation)
     print("cache = ", Tinfer.cache)
     print("num load = ", Tinfer.num_load)
-
+    print("******************************************")
     #Unify relation
     print(unification.solve_system(Tinfer.relation))
 

@@ -12,7 +12,7 @@ import sys
 import string
 sys.path.append("../")
 
-from basics import *
+from custom_types.basics import *
 from Parser.parser import *
 
 def set_name():
