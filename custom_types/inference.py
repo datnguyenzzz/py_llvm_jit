@@ -5,6 +5,9 @@
 #%join = phi i32 [ %plusOne, %left], [ -1, %right]
  
 # So need to inference to own-defined type in LLVM [%..]
+
+#ONLY SUPPORT EQUALITY RELATIONS 
+#IN LARGE SCALE, ALL RELATIONS WILL BE INVOLVED
 import sys
 import string
 sys.path.append("../")
@@ -23,8 +26,16 @@ def set_name():
 class TypeInference(object):
     def __init__(self):
         self._names = set_name() 
-        self._equal_relation = []
+        self._relation = []
         self._cache = {}
+    
+    @property 
+    def relation(self):
+        return self._relation
+
+    @property
+    def cache(self):
+        return self._cache
     
     def __call__(self, node):
         self.visit(node)
@@ -66,11 +77,11 @@ class TypeInference(object):
         new_mem = self.get_name()
         type_arr = self.visit(node.value) 
         type_attr = self.visit(node.nslice) 
-        self._equal_relation.append((type_arr, array(new_mem)))
+        self._relation.append((type_arr, "#=", array(new_mem)))
         if isinstance(type_attr, list):
-            self._equal_relation.extend([(t, int32) for t in type_attr])
+            self._relation.extend([(t, "#=", int32) for t in type_attr])
         else:
-            self._equal_relation.append((type_attr, int32))
+            self._relation.append((type_attr, "#=", int32))
         return new_mem
 
     def visit_Index(self, node, attrs = None):
@@ -89,19 +100,18 @@ class TypeInference(object):
         #print("** BinOp **",node.right)
         type_left = self.visit(node.left)
         type_right = self.visit(node.right)
-        self._equal_relation.append((type_left, type_right)) 
+        self._relation.append((type_left, "#=", type_right)) 
 
-        return type_left
+        return type_right
  
     def visit_Assign(self, node, attrs = None):
         #Int/Float --> $ptr
         #node.value = Int/Float/Op
         dtype_value = self.visit(node.value)
-        
         targets = node.targets
         if targets.id in self._cache:
             # y = x , x = $ptr => y = $ptr
-            self._equal_relation.append((dtype_value, self._cache[targets.id])) 
+            self._relation.append((dtype_value, "#=", self._cache[targets.id])) 
 
         _ = self.visit(node.targets, dtype_value)
         return None
@@ -126,9 +136,27 @@ class TypeInference(object):
         for_id = self.visit(node.target, int32)
         range_bounded = self.visit(node.iter)
         
-        self._equal_relation.append((for_id,int32)) 
-        self._equal_relation.extend([(b,int32) for b in range_bounded])
+        self._relation.append((for_id,"#=",int32)) 
+        self._relation.extend([(b,"#=",int32) for b in range_bounded])
         
+        _ = list(map(self.visit, node.body))
+        return None
+    
+    def visit_Compare(self, node, attrs = None):
+        #left ops comparetors 
+        # 0 <= i < n <=> 0 [<=, <] [i,n]
+        left = [self.visit(node.left)]
+        comparators = list(map(self.visit, node.comparators)) 
+        left.extend(comparators)
+        ops = node.ops 
+        rel = [(left[i],ops[i],left[i+1]) for i in range(len(ops))] 
+        for r in rel:
+            self._relation.append(r)
+
+        return None
+    
+    def visit_While(self, node, attrs = None):
+        _ = self.visit(node.test)
         _ = list(map(self.visit, node.body))
         return None
     
@@ -137,6 +165,7 @@ class TypeInference(object):
         
         body = list(map(self.visit, node.body)) 
         type_ret = body[-1]
+        self._relation.append((type_ret, "#=", TVar("$ret")))
 
         #print("** cache **",self._cache)
         #print("** relation **", self._equal_relation)
@@ -150,18 +179,4 @@ class TypeInference(object):
         return NotImplementedError
     
 if __name__ == "__main__":
-    def addup(a,b):
-        a = [1,2,3,4,5]
-        a = a[1:4:2]
-        n = 5
-        tmp = 0
-        for i in range(n):
-            tmp += a[i]
-        return tmp
-
-    parser_tree = Parser(addup) 
-    node = parser_tree.syntax_tree 
-    #inference node to type
-    type_node = TypeInference(node)
-    node = type_node.syntax_tree
-    print(node)
+    pass

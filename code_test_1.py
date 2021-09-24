@@ -1,7 +1,8 @@
 def addup(a,b):
-    a = [1,2,3,4,5]
+    i = 0
     n = 5
     tmp = 0
-    for i in range(n):
-        tmp += a[i]
+    while 0 <= i < n:
+        tmp += i 
+        i += 1
     return tmp

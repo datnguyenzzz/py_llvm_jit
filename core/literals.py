@@ -4,8 +4,8 @@ import ast
 class Int(ast.AST):
     def __init__(self, n, typ=None):
         self._n = n 
-        self._type = typ
-        self._fields = ["n"]
+        self._dtype = typ
+        self._fields = ["n", "dtype"]
 
     @property 
     def n(self):
@@ -14,6 +14,14 @@ class Int(ast.AST):
     @n.setter 
     def n(self,new_n):
         self._n = new_n
+
+    @property 
+    def dtype(self):
+        return self._dtype
+
+    @dtype.setter 
+    def dtype(self,new_dtype):
+        self._dtype = new_dtype
     
     @property
     def fields(self):

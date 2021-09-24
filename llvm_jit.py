@@ -30,7 +30,10 @@ def parsing(IN):
     #inference node to type
     Tinfer = inference.TypeInference()
     Tinfer(core)
+    #Testing Tinfer attributes
     print(ast_parsing.dump(core))
+    print(Tinfer.relation)
+    print(Tinfer.cache)
 
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser() 
