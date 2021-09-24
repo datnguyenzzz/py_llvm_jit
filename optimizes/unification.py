@@ -31,7 +31,7 @@ from functools import reduce
 #TCon = type 
 #TVar = variable 
 #TFunc = f(g1(),g2(),...) => gk()
-#TApp = f(g())
+#TApp = f(..)
 
 def empty():
     return {}
@@ -41,8 +41,10 @@ def occurs_check(var, f):
         if isinstance(f, TCon):
             return set() 
         elif isinstance(f, TApp):
-            return lookup(f.con) | lookup(f.dtype) 
+            #fn(...)(args)
+            return lookup(f.fn) | lookup(f.args) 
         elif isinstance(f, TFunc):
+            #f(g1(),g2(),...) => ret()
             return reduce(set.union, map(lookup, f.args)) | lookup(f.ret)
         elif isinstance(f, TVar):
             return set([f])
@@ -51,13 +53,10 @@ def occurs_check(var, f):
 
 def bind(var, f):
     if var == f:
-        #x = x ---> {}
         return empty() 
     elif occurs_check(var, f):
-        #x = f(x) ---> infinite
         raise InfiniteType(var, f) 
     else:
-        #a = x ---> a->b
         return dict([(var,f)])
 
 def unify(f_1,f_2):
@@ -78,9 +77,15 @@ def apply(cp, x):
     if isinstance(x, TCon):
         return x 
     elif isinstance(x, TApp):
-        pass 
+        #cp ( fn(...)(args) )
+        # = cp(fn(...)) (cp(args))
+        return TApp(apply(cp, x.fn), apply(cp, x.args))
     elif isinstance(x, TFunc):
-        pass 
+        # cp ( f(g1(),g2(),...) => ret() )
+        # f(cp(g1()), cp(g2()), ...) => cp(ret())
+        args = [apply(cp,a) for a in x.args]
+        ret = apply(cp, x.ret)
+        return TFunc(args, ret)
     elif isinstance(x, TVar):
         #cp(x) => y <-> CP[x/y]
         return cp.get(x.value, x)
@@ -88,7 +93,7 @@ def apply(cp, x):
 def applyList(s, xs):
     return [(apply(s,x) , apply(s,y)) for x,y in xs]
 
-def compose(cp, substitution):
+def merge(cp, substitution):
     # S1[x1/y1] + S2[x2/y2] => [x/y : x2/cp(S1(y2))]  
     tmp = dict((x, apply(cp,y)) for x,y in substitution.items()) 
     _tmp = cp.copy() 
@@ -101,8 +106,8 @@ def solve(relations):
     while len(tmp) > 0:
         (x,y) = tmp.pop() 
         cp = unify(x,y)
-        mgu = compose(cp, mgu)
         tmp = applyList(cp, tmp)
+        mgu = merge(cp, mgu)
 
     print(mgu)
 

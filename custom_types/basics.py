@@ -56,37 +56,37 @@ class TCon(object):
         return self._value
 
 class TApp(object):
-    def __init__(self, con, dtype):
-        self._con = con 
-        self._dtype = dtype
+    def __init__(self, fn, args):
+        self._fn = fn 
+        self._args = args
     
     @property
-    def con(self):
-        return self._con
+    def fn(self):
+        return self._fn
 
-    @con.setter 
-    def con(self,n_con): 
-        self._con = n_con
+    @fn.setter 
+    def fn(self,n_fn): 
+        self._fn = n_fn
 
     @property
-    def dtype(self):
-        return self._dtype
+    def args(self):
+        return self._args
 
-    @dtype.setter 
-    def dtype(self,n_dtype): 
-        self._dtype = n_dtype
+    @args.setter 
+    def args(self,n_args): 
+        self._args = n_args
     
     def __hash__(self):
-        return hash((self._con,self._dtype))
+        return hash((self._fn,self._args))
     
     def __eq__(self, other):
         if isinstance(other, TApp):
-            return self._con == other._con and self._dtype == other._dtype
+            return self._fn == other._fn and self._args == other._args
         else:
             return False
     
     def __repr__(self):
-        return str(self._con) + " " + str(self._dtype)
+        return str(self._fn) + " " + str(self._args)
 
 class TFunc(object):
     def __init__(self, args, ret):
