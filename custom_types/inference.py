@@ -77,11 +77,11 @@ class TypeInference(object):
         new_mem = self.get_name()
         type_arr = self.visit(node.value) 
         type_attr = self.visit(node.nslice) 
-        self._relation.append((type_arr, "#=", array(new_mem)))
+        self._relation.append(("#=", type_arr, array(new_mem)))
         if isinstance(type_attr, list):
-            self._relation.extend([(t, "#=", int32) for t in type_attr])
+            self._relation.extend([("#=", t, int32) for t in type_attr])
         else:
-            self._relation.append((type_attr, "#=", int32))
+            self._relation.append(("#=", type_attr, int32))
         return new_mem
 
     def visit_Index(self, node, attrs = None):
@@ -100,7 +100,7 @@ class TypeInference(object):
         #print("** BinOp **",node.right)
         type_left = self.visit(node.left)
         type_right = self.visit(node.right)
-        self._relation.append((type_left, "#=", type_right)) 
+        self._relation.append(("#=", type_left, type_right)) 
 
         return type_right
  
@@ -111,7 +111,7 @@ class TypeInference(object):
         targets = node.targets
         if targets.id in self._cache:
             # y = x , x = $ptr => y = $ptr
-            self._relation.append((dtype_value, "#=", self._cache[targets.id])) 
+            self._relation.append(("#=", dtype_value, self._cache[targets.id])) 
 
         _ = self.visit(node.targets, dtype_value)
         return None
@@ -136,8 +136,8 @@ class TypeInference(object):
         for_id = self.visit(node.target, int32)
         range_bounded = self.visit(node.iter)
         
-        self._relation.append((for_id,"#=",int32)) 
-        self._relation.extend([(b,"#=",int32) for b in range_bounded])
+        self._relation.append(("#=",for_id,int32)) 
+        self._relation.extend([("#=",b,int32) for b in range_bounded])
         
         _ = list(map(self.visit, node.body))
         return None
@@ -149,7 +149,7 @@ class TypeInference(object):
         comparators = list(map(self.visit, node.comparators)) 
         left.extend(comparators)
         ops = node.ops 
-        rel = [(left[i],ops[i],left[i+1]) for i in range(len(ops))] 
+        rel = [(ops[i],left[i],left[i+1]) for i in range(len(ops))] 
         for r in rel:
             self._relation.append(r)
 
@@ -165,7 +165,7 @@ class TypeInference(object):
         
         body = list(map(self.visit, node.body)) 
         type_ret = body[-1]
-        self._relation.append((type_ret, "#=", TVar("$ret")))
+        self._relation.append(("#=", type_ret, TVar("$ret")))
 
         #print("** cache **",self._cache)
         #print("** relation **", self._equal_relation)
