@@ -3,24 +3,23 @@
 
 #ONLY SUPPORT BINARY RELATIONS 
 #IN LARGE SCALE, ALL RELATIONS WILL BE INVOLVED
-# Unify( P(x1,y1) , P(x2,y2) ) => [...,...]
+# Unify( P(x1,y1) , P(x2,y2) ) => [x1/x2,y1/y2] 
 
 def solve(relations):
-    print(relations)
+    pass
 
 def solve_system(relations):
     equations = {} 
     for f,x,y in relations:
+        # f - type expression 
+        # x,y - TVar
+
         if f not in equations:
             equations[f] = [] 
-        
         equations[f].append((x,y)) 
     
     for f in list(equations):
         _ = solve(equations[f])
 
 if __name__ == "__main__":
-    relations = [('#=', "$d", "$g"), ('#<=', "$f", "$c"), ('#<', "$c", "$g"), ('#=', "$e", "$c"), 
-                 ('#=', "$c", '$e'), ('#=', '$c', '$h'), ('#=', '$h', '$c'), ('#=', '$e', '$ret')] 
-    
-    print(solve_system(relations))
+    pass

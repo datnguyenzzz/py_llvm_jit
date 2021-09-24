@@ -27,6 +27,7 @@ class TypeInference(object):
     def __init__(self):
         self._names = set_name() 
         self._relation = []
+        self._num_load = []
         self._cache = {}
     
     @property 
@@ -36,6 +37,10 @@ class TypeInference(object):
     @property
     def cache(self):
         return self._cache
+    
+    @property
+    def num_load(self):
+        return self._num_load
     
     def __call__(self, node):
         self.visit(node)
@@ -60,10 +65,12 @@ class TypeInference(object):
     
     def visit_Int(self, node, attrs = None):
         node.dtype = self.get_name() 
+        self._num_load.append((node.dtype,int(node.n)))
         return node.dtype
     
     def visit_Float(self, node, attrs = None):
         node.dtype = self.get_name() 
+        self._num_load.append((node.dtype,float(node.n)))
         return node.dtype
     
     def visit_List(self, node, attrs = None):

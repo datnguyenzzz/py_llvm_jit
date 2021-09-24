@@ -13,6 +13,7 @@ from Parser import parser
 from custom_types import inference
 from AST import ast_parsing
 from utils import file_op
+from optimizes import unification
 
 def build_AST_tree(IN, OUT):
     source = file_op.read_from_file(IN)
@@ -27,13 +28,19 @@ def parsing(IN):
     source = file_op.read_from_file(IN) 
     parsed = parser.Parser(source) 
     core = parsed.syntax_tree
+
     #inference node to type
     Tinfer = inference.TypeInference()
     Tinfer(core)
+
     #Testing Tinfer attributes
     print(ast_parsing.dump(core))
-    print(Tinfer.relation)
-    print(Tinfer.cache)
+    print("relations = ",Tinfer.relation)
+    print("cache = ", Tinfer.cache)
+    print("num load = ", Tinfer.num_load)
+
+    #Unify relation
+    print(unification.solve_system(Tinfer.relation))
 
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser() 
