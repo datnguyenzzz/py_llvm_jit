@@ -3,26 +3,51 @@
 
 #ONLY SUPPORT BINARY RELATIONS 
 #IN LARGE SCALE, ALL RELATIONS WILL BE INVOLVED
-# Unify( P(x1,y1) , P(x2,y2) ) => [x1/x2,y1/y2] 
+
+#Step. 1: If Ψ1 or Ψ2 is a variable or constant, then:
+#	a) If Ψ1 or Ψ2 are identical, then return NIL. 
+#	b) Else if Ψ1is a variable, 
+#		a. then if Ψ1 occurs in Ψ2, then return FAILURE
+#		b. Else return { (Ψ2/ Ψ1)}.
+#	c) Else if Ψ2 is a variable, 
+#		a. If Ψ2 occurs in Ψ1 then return FAILURE,
+#		b. Else return {( Ψ1/ Ψ2)}. 
+#	d) Else return FAILURE. 
+#Step.2: If the initial Predicate symbol in Ψ1 and Ψ2 are not same, then return FAILURE.
+#Step. 3: IF Ψ1 and Ψ2 have a different number of arguments, then return FAILURE.
+#Step. 4: Set Substitution set(SUBST) to NIL. 
+#Step. 5: For i=1 to the number of elements in Ψ1. 
+#	a) Call Unify function with the ith element of Ψ1 and ith element of Ψ2, and put the result into S.
+#	b) If S = failure then returns Failure
+#	c) If S ≠ NIL then do,
+#		a. Apply S to the remainder of both L1 and L2.
+#		b. SUBST= APPEND(S, SUBST). 
+#Step.6: Return SUBST. 
+
 
 from custom_types.basics import * 
 from functools import reduce
 
+#TCon = type 
+#TVar = variable 
+#TFunc = f(g1(),g2(),...) => gk()
+#TApp = f(g())
+
 def empty():
     return {}
 
-def arguments(f):
-    if isinstance(f, TCon):
-        return set() 
-    elif isinstance(f, TApp):
-        return arguments(f.con) | arguments(f.dtype) 
-    elif isinstance(f, TFunc):
-        return reduce(set.union, map(arguments, f.args)) | arguments(f.ret)
-    elif isinstance(f, TVar):
-        return set([f])
-
 def occurs_check(var, f):
-    return var in arguments(f)
+    def lookup(f):
+        if isinstance(f, TCon):
+            return set() 
+        elif isinstance(f, TApp):
+            return lookup(f.con) | lookup(f.dtype) 
+        elif isinstance(f, TFunc):
+            return reduce(set.union, map(lookup, f.args)) | lookup(f.ret)
+        elif isinstance(f, TVar):
+            return set([f])
+
+    return var in lookup(f)
 
 def bind(var, f):
     if var == f:
@@ -42,21 +67,44 @@ def unify(f_1,f_2):
         return empty() 
     elif isinstance(f_1,TFunc) and isinstance(f_2,TFunc):
         pass
-    elif isinstance(f_1, TVar): #occur check to avoid leading infinite term
+    elif isinstance(f_1, TVar):
         return bind(f_1.value, f_2) 
-    elif isinstance(y, TVar): #occur check to avoid leading infinite term
+    elif isinstance(f_2, TVar): 
         return bind(f_2.value, f_1) 
     else:
         raise InferenceError(f_1,f_2)
 
+def apply(cp, x):
+    if isinstance(x, TCon):
+        return x 
+    elif isinstance(x, TApp):
+        pass 
+    elif isinstance(x, TFunc):
+        pass 
+    elif isinstance(x, TVar):
+        #cp(x) => y <-> CP[x/y]
+        return cp.get(x.value, x)
+
+def applyList(s, xs):
+    return [(apply(s,x) , apply(s,y)) for x,y in xs]
+
+def compose(cp, substitution):
+    # S1[x1/y1] + S2[x2/y2] => [x/y : x2/cp(S1(y2))]  
+    tmp = dict((x, apply(cp,y)) for x,y in substitution.items()) 
+    _tmp = cp.copy() 
+    _tmp.update(tmp) 
+    return _tmp
+
 def solve(relations):
     mgu = {} 
     tmp = relations 
-
     while len(tmp) > 0:
         (x,y) = tmp.pop() 
-        unification = unify(x,y)
-        print(unification)
+        cp = unify(x,y)
+        mgu = compose(cp, mgu)
+        tmp = applyList(cp, tmp)
+
+    print(mgu)
 
 def solve_system(relations):
     equations = {} 
