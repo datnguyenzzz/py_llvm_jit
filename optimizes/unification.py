@@ -119,7 +119,7 @@ def solve(relations):
         tmp = applyList(cp, tmp)
         mgu = merge(cp, mgu)
 
-    print(mgu)
+    return mgu
 
 def solve_system(relations):
     equations = {} 
@@ -130,8 +130,13 @@ def solve_system(relations):
             equations[f] = [] 
         equations[f].append((x,y)) 
     
+    result = []
+
     for f in list(equations):
-        _ = solve(equations[f])
+        tmp = solve(equations[f]) 
+        result.extend([(f,x,y) for x,y in tmp.items()]) 
+    
+    return result
 
 if __name__ == "__main__":
     pass
