@@ -41,10 +41,10 @@ def occurs_check(var, f):
         if isinstance(f, TCon):
             return set() 
         elif isinstance(f, TApp):
-            #fn(...)(args)
-            return lookup(f.fn) | lookup(f.args) 
+            #fn(...)(arg)
+            return lookup(f.fn) | lookup(f.arg) 
         elif isinstance(f, TFunc):
-            #f(g1(),g2(),...) => ret()
+            #(g1(),g2(),...) => ret()
             return reduce(set.union, map(lookup, f.args)) | lookup(f.ret)
         elif isinstance(f, TVar):
             return set([f])
@@ -61,11 +61,21 @@ def bind(var, f):
 
 def unify(f_1,f_2):
     if isinstance(f_1,TApp) and isinstance(f_2,TApp):
-        pass 
+        #f_1()(X) = f_2()(Y) => {(f_1/f_2),(f_1/f_2)(X/Y)}
+        subs_1 = unify(f_1.fn,f_2.fn) 
+        subs_2 = unify(apply(subs_1,f_1.arg), apply(subs_2,f_2.arg))
+        return merge(subs_2,subs_1)
     elif isinstance(f_1,TCon) and isinstance(f_2,TCon) and (f_1==f_2):
         return empty() 
     elif isinstance(f_1,TFunc) and isinstance(f_2,TFunc):
-        pass
+        #(g1,..) => r1 = (_g1,..) => r2
+        #{(g1/_g1),.., (g1/_g1)...(r1/r2) }
+        if len(f_1.args) != len(f_2.args):
+            return Exception("2 Functions have different number of arguments") 
+        
+        subs_1 = solve(zip(f_1.args, f_2.args))
+        subs_2 = unify(apply(subs_1, f_1.ret), apply(subs_1,f_2.ret))
+        return merge(subs_2, subs_1)
     elif isinstance(f_1, TVar):
         return bind(f_1.value, f_2) 
     elif isinstance(f_2, TVar): 
@@ -78,11 +88,11 @@ def apply(cp, x):
         return x 
     elif isinstance(x, TApp):
         #cp ( fn(...)(args) )
-        # = cp(fn(...)) (cp(args))
-        return TApp(apply(cp, x.fn), apply(cp, x.args))
+        # = cp(fn(...)) (cp(arg))
+        return TApp(apply(cp, x.fn), apply(cp, x.arg))
     elif isinstance(x, TFunc):
-        # cp ( f(g1(),g2(),...) => ret() )
-        # f(cp(g1()), cp(g2()), ...) => cp(ret())
+        # cp ( (g1(),g2(),...) => ret() )
+        # (cp(g1()), cp(g2()), ...) => cp(ret())
         args = [apply(cp,a) for a in x.args]
         ret = apply(cp, x.ret)
         return TFunc(args, ret)
@@ -94,7 +104,7 @@ def applyList(s, xs):
     return [(apply(s,x) , apply(s,y)) for x,y in xs]
 
 def merge(cp, substitution):
-    # S1[x1/y1] + S2[x2/y2] => [x/y : x2/cp(S1(y2))]  
+    # S1[x1/y1] + S2[x2/y2] => [x/y : x2/cp(y2)]  
     tmp = dict((x, apply(cp,y)) for x,y in substitution.items()) 
     _tmp = cp.copy() 
     _tmp.update(tmp) 

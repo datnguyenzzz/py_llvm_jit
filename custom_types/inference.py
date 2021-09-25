@@ -171,8 +171,9 @@ class TypeInference(object):
         type_args = self.visit_args(node.args)
         
         body = list(map(self.visit, node.body)) 
-        type_ret = body[-1]
-        self._relation.append(("#=", type_ret, TVar("$ret")))
+        #type_ret = body[-1]
+        #self._relation.append(("#=", type_ret, TVar("$ret")))
+        type_ret = TVar("$ret")
 
         #print("** cache **",self._cache)
         #print("** relation **", self._equal_relation)

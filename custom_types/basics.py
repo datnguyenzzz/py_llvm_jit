@@ -56,9 +56,9 @@ class TCon(object):
         return self._value
 
 class TApp(object):
-    def __init__(self, fn, args):
+    def __init__(self, fn, arg):
         self._fn = fn 
-        self._args = args
+        self._arg = arg
     
     @property
     def fn(self):
@@ -69,24 +69,24 @@ class TApp(object):
         self._fn = n_fn
 
     @property
-    def args(self):
-        return self._args
+    def arg(self):
+        return self._arg
 
-    @args.setter 
-    def args(self,n_args): 
-        self._args = n_args
+    @arg.setter 
+    def arg(self,n_arg): 
+        self._arg = n_arg
     
     def __hash__(self):
-        return hash((self._fn,self._args))
+        return hash((self._fn,self._arg))
     
     def __eq__(self, other):
         if isinstance(other, TApp):
-            return self._fn == other._fn and self._args == other._args
+            return self._fn == other._fn and self._arg == other._arg
         else:
             return False
     
     def __repr__(self):
-        return str(self._fn) + " " + str(self._args)
+        return str(self._fn) + " ( " + str(self._arg) + " ) "
 
 class TFunc(object):
     def __init__(self, args, ret):
