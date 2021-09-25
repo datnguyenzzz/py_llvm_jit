@@ -25,6 +25,7 @@ def set_name():
 
 class TypeInference(object):
     def __init__(self):
+        self._type_ret = None
         self._names = set_name() 
         self._relation = []
         self._num_load = []
@@ -169,18 +170,16 @@ class TypeInference(object):
     
     def visit_FunctionDef(self, node, attrs = None):
         type_args = self.visit_args(node.args)
-        
-        body = list(map(self.visit, node.body)) 
-        #type_ret = body[-1]
-        #self._relation.append(("#=", type_ret, TVar("$ret")))
-        type_ret = TVar("$ret")
+        self._type_ret = TVar("$ret")
+        _ = list(map(self.visit, node.body)) 
 
         #print("** cache **",self._cache)
         #print("** relation **", self._equal_relation)
-        return TFunc(type_args, type_ret)
+        return TFunc(type_args, self._type_ret)
     
     def visit_Return(self, node, attrs = None):
         type_ret = self.visit(node.value)
+        self._relation.append(("#=",type_ret, self._type_ret))
         return type_ret
 
     def visit_generic(self,node):
