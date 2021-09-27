@@ -79,6 +79,21 @@ class LLVMEmitter(object):
         self.function = function
         self.builder = builder
         self.exit_block = function.append_basic_block("exit")
-
-
     
+    def end_function(self):
+        self._builder.position_at_end(self._exit_block)
+
+        if 'retval' in self._locals:
+            #return a variable 
+            retval = self._builder.load(self._locals['retval']) 
+            self._builder.ret(retval) 
+        else:
+            self._builder.ret_void()
+
+    def add_block(self, name):
+        return self._function.append_basic_block(name)
+
+if __name__ == "__main__":
+    pass 
+    
+        
