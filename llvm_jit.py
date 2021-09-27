@@ -6,9 +6,6 @@ import pprint
 CURR = os.path.dirname(os.path.abspath(__file__)) 
 sys.path.append(CURR+"/custom_types")
 
-import llvmlite.binding as llvm
-from llvmlite import ir
-
 from Parser import parser
 from custom_types import inference
 from AST import ast_parsing
@@ -41,7 +38,8 @@ def parsing(IN):
     print("num load = ", Tinfer.num_load)
     print("******************************************")
     #Unify relation
-    print(unification.solve_system(Tinfer.relation))
+    print("After unified: ", unification.solve_system(Tinfer.relation))
+    print("******************************************")
 
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser() 
