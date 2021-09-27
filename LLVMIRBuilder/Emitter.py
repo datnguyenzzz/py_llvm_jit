@@ -1,6 +1,11 @@
 #IRBuilder is the workhorse of LLVM Intermediate representation 
 #(IR) generation. It allows you to fill the basic blocks of your functions with LLVM instructions.
 
+import sys 
+sys.path.append("../")
+
+from LLVMIRBuilder.LLVM_types import *
+
 from collections import defaultdict
 from llvmlite import ir
 
