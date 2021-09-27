@@ -2,6 +2,7 @@
 #(IR) generation. It allows you to fill the basic blocks of your functions with LLVM instructions.
 
 from collections import defaultdict
+from llvmlite import ir
 
 class LLVMEmitter(object):
     #Contains properties : 
@@ -55,4 +56,29 @@ class LLVMEmitter(object):
     @property 
     def _arg_types(self):
         return self.arg_types
+    
+    @function.setter
+    def function(self, n_function):
+        self._function = n_function
+    
+    @builder.setter
+    def builder(self, n_builder):
+        self._builder = n_builder
+    
+    @exit_block.setter
+    def exit_block(self, n_exit_block):
+        self._exit_block = n_exit_block
+    
+    def start_function(self, name, module, ret_type, arg_types):
+        #typedef int32_t (*fnty)(double, int32_t *);
+        func_type = ir.FunctionType(ret_type, arg_types, False)
+        function = ir.Function(module, func_type, name)
+
+        entry_block = function.append_basic_block("entry") 
+        builder = ir.IRBuilder(entry_block)
+        self.function = function
+        self.builder = builder
+        self.exit_block = function.append_basic_block("exit")
+
+
     
