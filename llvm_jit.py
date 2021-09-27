@@ -11,6 +11,7 @@ from custom_types import inference
 from AST import ast_parsing
 from utils import file_op
 from optimizes import unification
+from LLVMIRBuilder import Emitter
 
 def build_AST_tree(IN, OUT):
     source = file_op.read_from_file(IN)
@@ -40,6 +41,11 @@ def parsing(IN):
     #Unify relation
     print("After unified: ", unification.solve_system(Tinfer.relation))
     print("******************************************")
+    #LLVM Builder
+    codegen = Emitter.LLVMEmitter(None,None,None)
+    mod = codegen.visit(core)
+
+
 
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser() 

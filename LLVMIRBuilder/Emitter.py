@@ -15,7 +15,7 @@ class LLVMEmitter(object):
     #self._ret_type: return type 
     #self._arg_types: Argument types 
 
-    def __init__(self), spec_types, ret_type, arg_types):
+    def __init__(self, spec_types, ret_type, arg_types):
         self._function = None 
         self._builder = None 
         self._locals = {} 
@@ -54,8 +54,8 @@ class LLVMEmitter(object):
         return self._ret_type
     
     @property 
-    def _arg_types(self):
-        return self.arg_types
+    def arg_types(self):
+        return self._arg_types
     
     @function.setter
     def function(self, n_function):
@@ -92,6 +92,20 @@ class LLVMEmitter(object):
 
     def add_block(self, name):
         return self._function.append_basic_block(name)
+
+    #traverse thought AST tree 
+    def visit(self, node):
+        name = f"visit_{type(node).__name__}"
+        if hasattr(self, name):
+            return getattr(self,name)(node) 
+        else:
+            return self.generic_visit(node)
+    
+    def visit_FunctionDef(self, node):
+        print(vars(node))
+    
+    def generic_visit(self,node):
+        return NotImplementedError
 
 if __name__ == "__main__":
     pass 
