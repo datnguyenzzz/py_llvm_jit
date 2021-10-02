@@ -8,6 +8,7 @@ sys.path.append(CURR+"/custom_types")
 
 from Parser import parser
 from custom_types import inference
+from custom_types.basics import *
 from AST import ast_parsing
 from utils import file_op
 from optimizes import unification
@@ -42,10 +43,8 @@ def parsing(IN):
     print("After unified: ", unification.solve_system(Tinfer.relation))
     print("******************************************")
     #LLVM Builder
-    codegen = Emitter.LLVMEmitter(None,None,None)
+    codegen = Emitter.LLVMEmitter(None,int32,[int32])
     mod = codegen.visit(core)
-
-
 
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser() 

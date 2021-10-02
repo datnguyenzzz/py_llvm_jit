@@ -1,9 +1,16 @@
+#While modules in the IR layer allow you to build and group 
+#functions together(ir.Module), modules in the binding layer
+# give access to compilation, linking and execution of code
+# (ModuleRef)
+
 import sys 
 sys.path.append("../")
 
 from custom_types.basics import *
 
 from llvmlite import ir
+
+chief_module = ir.Module("llvm_py_jit.module")
 
 pointer = ir.PointerType
 
@@ -52,3 +59,7 @@ llvm_types_map = {
 
 def to_llvm_type(dtype):
     return llvm_types_map[dtype]
+
+#hashed function name with its arguments type 
+def name_hashed(fname, args):
+    return fname + str(hash(tuple(args))) 

@@ -19,6 +19,7 @@ class LLVMEmitter(object):
     #self._spec_types: type specialization 
     #self._ret_type: return type 
     #self._arg_types: Argument types 
+    #self._module: Module for wrap function together 
 
     def __init__(self, spec_types, ret_type, arg_types):
         self._function = None 
@@ -29,6 +30,11 @@ class LLVMEmitter(object):
         self._spec_types = spec_types 
         self._ret_type = ret_type 
         self._arg_types = arg_types
+        self._module = chief_module
+
+    @property
+    def module(self):
+        return self._module
     
     @property 
     def function(self):
@@ -84,6 +90,13 @@ class LLVMEmitter(object):
         self.function = function
         self.builder = builder
         self.exit_block = function.append_basic_block("exit")
+
+        print("-------------------")
+        print(function) 
+        print(entry_block)
+        print(builder) 
+        print(self.exit_block)
+        print("-------------------")
     
     def end_function(self):
         self._builder.position_at_end(self._exit_block)
@@ -108,6 +121,10 @@ class LLVMEmitter(object):
     
     def visit_FunctionDef(self, node):
         print(vars(node))
+        rettype = to_llvm_type(self.ret_type)
+        argtype = list(map(to_llvm_type, self.arg_types))
+        fname = name_hashed(node.name, self.arg_types) 
+        self.start_function(fname, self.module, rettype, argtype)
     
     def generic_visit(self,node):
         return NotImplementedError

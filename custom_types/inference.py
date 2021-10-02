@@ -32,6 +32,10 @@ class TypeInference(object):
         self._cache = {}
     
     @property 
+    def type_ret(self):
+        return self._type_ret
+    
+    @property 
     def relation(self):
         return self._relation
 
