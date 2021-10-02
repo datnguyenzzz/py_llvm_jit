@@ -43,7 +43,7 @@ def parsing(IN):
     print("After unified: ", unification.solve_system(Tinfer.relation))
     print("******************************************")
     #LLVM Builder
-    codegen = Emitter.LLVMEmitter(None,int32,[int32])
+    codegen = Emitter.LLVMEmitter(None,int32,[int32,int32])
     mod = codegen.visit(core)
 
 if __name__ == "__main__":

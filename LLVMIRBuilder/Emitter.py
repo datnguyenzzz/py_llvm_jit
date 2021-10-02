@@ -91,12 +91,12 @@ class LLVMEmitter(object):
         self.builder = builder
         self.exit_block = function.append_basic_block("exit")
 
-        print("-------------------")
-        print(function) 
-        print(entry_block)
-        print(builder) 
-        print(self.exit_block)
-        print("-------------------")
+        #print("-------------------")
+        #print(function) 
+        #print(entry_block)
+        #print(builder) 
+        #print(self.exit_block)
+        #print("-------------------")
     
     def end_function(self):
         self._builder.position_at_end(self._exit_block)
@@ -125,6 +125,10 @@ class LLVMEmitter(object):
         argtype = list(map(to_llvm_type, self.arg_types))
         fname = name_hashed(node.name, self.arg_types) 
         self.start_function(fname, self.module, rettype, argtype)
+        
+        for (node_arg, llvm_arg, func_arg) in zip(node.args, self.function.args, self.arg_types):
+            print(f"{node_arg} - {llvm_arg} - {func_arg}")
+            print(f"{node_arg.id} - {llvm_arg.name}")
     
     def generic_visit(self,node):
         return NotImplementedError
