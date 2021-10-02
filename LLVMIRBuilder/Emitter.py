@@ -9,6 +9,16 @@ from LLVMIRBuilder.LLVM_types import *
 from collections import defaultdict
 from llvmlite import ir
 
+def set_const(self, val):
+    if isinstance(val, int):
+        return ir.Constant(int_type, val) 
+    elif isinstance(val, float):
+        return ir.Constant(double_type, val) 
+    elif isinstance(val, bool):
+        return ir.Constant(bool_type, int(val))
+    else:
+        raise NotImplementedError 
+
 class LLVMEmitter(object):
     #Contains properties : 
     #self._function : LLVM Function 
@@ -136,7 +146,7 @@ class LLVMEmitter(object):
                 arg_ref = self.builder.alloca(to_llvm_type(func_arg)) 
                 self.builder.store(llvm_arg, arg_ref) 
                 self.locals[fname] = arg_ref
-                #print(f"{fname} - {llvm_arg} -> {arg_ref}")
+                print(f"{fname} - {llvm_arg} -> {arg_ref}")
     
     def generic_visit(self,node):
         return NotImplementedError
