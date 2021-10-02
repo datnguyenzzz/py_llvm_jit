@@ -9,7 +9,7 @@ from LLVMIRBuilder.LLVM_types import *
 from collections import defaultdict
 from llvmlite import ir
 
-def set_const(self, val):
+def set_const(val):
     if isinstance(val, int):
         return ir.Constant(int_type, val) 
     elif isinstance(val, float):
@@ -130,27 +130,36 @@ class LLVMEmitter(object):
             return self.generic_visit(node)
     
     def visit_FunctionDef(self, node):
-        rettype = to_llvm_type(self.ret_type)
-        argtype = list(map(to_llvm_type, self.arg_types))
-        fname = name_hashed(node.name, self.arg_types) 
-        self.start_function(fname, self.module, rettype, argtype)
+        rettype = to_llvm_type(self._ret_type)
+        argtype = list(map(to_llvm_type, self._arg_types))
+        fname = name_hashed(node.name, self._arg_types) 
+        self.start_function(fname, self._module, rettype, argtype)
         
-        for (node_arg, llvm_arg, func_arg) in zip(node.args, self.function.args, self.arg_types):
+        for (node_arg, llvm_arg, func_arg) in zip(node.args, self._function.args, self._arg_types):
             arg_name = node_arg.id 
             llvm_arg.name = arg_name
 
             if is_array(func_arg):
-                pass 
+                zero,one,two = set_const(0), set_const(1), set_const(2) 
+                data = self._builder.gep(llvm_arg, [zero, zero], name=(arg_name + "_data")) 
+                dims = self._builder.gep(llvm_arg, [zero, one], name=(arg_name + "_dims")) 
+                shape = self._builder.get(llvm_arg, [zero, two], name=(arg_name + "_shape"))
+
+                self._meta_data[arg_name]['data'] = self._builder.load(data) 
+                self._meta_data[arg_name]['dims'] = self._builder.load(dims) 
+                self._meta_data[arg_name]['shape'] = self._builder.load(shape) 
+                self._locals[arg_name] = llvm_arg
             else:
                 #alloca and store func arg to
-                arg_ref = self.builder.alloca(to_llvm_type(func_arg)) 
-                self.builder.store(llvm_arg, arg_ref) 
-                self.locals[arg_name] = arg_ref
+                arg_ref = self._builder.alloca(to_llvm_type(func_arg)) 
+                self._builder.store(llvm_arg, arg_ref) 
+                self._locals[arg_name] = arg_ref
                 #print(f"{arg_name} - {llvm_arg} -> {arg_ref}")
         
         if rettype is not void_type:
-            self.locals['retval'] = self.builder.alloca(rettype, name="retval")
+            self._locals['retval'] = self._builder.alloca(rettype, name="retval")
         
+        print(self._locals)
         _ = list(map(self.visit, node.body)) 
         self.end_function()
     
