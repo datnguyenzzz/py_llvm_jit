@@ -130,7 +130,6 @@ class LLVMEmitter(object):
             return self.generic_visit(node)
     
     def visit_FunctionDef(self, node):
-        print(vars(node))
         rettype = to_llvm_type(self.ret_type)
         argtype = list(map(to_llvm_type, self.arg_types))
         fname = name_hashed(node.name, self.arg_types) 
@@ -147,7 +146,13 @@ class LLVMEmitter(object):
                 arg_ref = self.builder.alloca(to_llvm_type(func_arg)) 
                 self.builder.store(llvm_arg, arg_ref) 
                 self.locals[arg_name] = arg_ref
-                print(f"{arg_name} - {llvm_arg} -> {arg_ref}")
+                #print(f"{arg_name} - {llvm_arg} -> {arg_ref}")
+        
+        if rettype is not void_type:
+            self.locals['retval'] = self.builder.alloca(rettype, name="retval")
+        
+        _ = list(map(self.visit, node.body)) 
+        self.end_function()
     
     def generic_visit(self,node):
         return NotImplementedError
