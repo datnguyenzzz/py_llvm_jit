@@ -151,7 +151,7 @@ array_int64 = array(int64)
 array_double64 = array(double64)
 
 def is_array(typ):
-    return isinstance(ty, TApp) and ty.fn == TCon("Array")
+    return isinstance(typ, TApp) and typ.fn == TCon("Array")
 
 if __name__=="__main__":
     print(array_int64)

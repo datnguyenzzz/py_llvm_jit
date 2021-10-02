@@ -127,8 +127,16 @@ class LLVMEmitter(object):
         self.start_function(fname, self.module, rettype, argtype)
         
         for (node_arg, llvm_arg, func_arg) in zip(node.args, self.function.args, self.arg_types):
-            print(f"{node_arg} - {llvm_arg} - {func_arg}")
-            print(f"{node_arg.id} - {llvm_arg.name}")
+            #print(f"{node_arg} - {llvm_arg} - {func_arg}")
+            #print(f"{node_arg.id} - {llvm_arg.name}")
+            if is_array(func_arg):
+                pass 
+            else:
+                #alloca and store func arg to
+                arg_ref = self.builder.alloca(to_llvm_type(func_arg)) 
+                self.builder.store(llvm_arg, arg_ref) 
+                self.locals[fname] = arg_ref
+                #print(f"{fname} - {llvm_arg} -> {arg_ref}")
     
     def generic_visit(self,node):
         return NotImplementedError
