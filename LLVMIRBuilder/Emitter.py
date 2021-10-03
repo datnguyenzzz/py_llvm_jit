@@ -166,10 +166,10 @@ class LLVMEmitter(object):
         self.end_function()
     
     def visit_Int(self,node):
-        print(type(node), node.dtype)
+        print("INT - TBH")
     
     def visit_Float(self,node):
-        print(type(node), node.dtype)
+        print("FLOAT - TBH")
     
     def visit_Assign(self, node):
         #doesn't support subsequent assignment
