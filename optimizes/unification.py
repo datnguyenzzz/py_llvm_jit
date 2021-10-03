@@ -130,11 +130,11 @@ def solve_system(relations):
             equations[f] = [] 
         equations[f].append((x,y)) 
     
-    result = []
+    result = {}
 
     for f in list(equations):
         tmp = solve(equations[f]) 
-        result.extend([(f,x,y) for x,y in tmp.items()]) 
+        result[f] = tmp 
     
     return result
 

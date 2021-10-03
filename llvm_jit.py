@@ -23,26 +23,37 @@ def build_AST_tree(IN, OUT):
     else:
         file_op.write_to_file(OUT, ast_tree)
 
+def type_infer(ast):
+    Tinfer = inference.TypeInference()
+    ftype = Tinfer.visit(ast)
+    mgu = unification.solve_system(Tinfer.relation)
+    equal = "#="
+    infer_ftype = unification.apply(mgu[equal], ftype) 
+    if DEBUG:
+        print("******************************************")
+        print("relations = ",Tinfer.relation)
+        print("cache = ", Tinfer.cache)
+        print("num load = ", Tinfer.num_load)
+        print("******************************************")
+        #Unify relation
+        print("func equation before inference: ", ftype)
+        print("After unified: ", mgu) 
+        print("func equation after inference: ", infer_ftype)
+        print("******************************************")
+    
+    return (infer_ftype, mgu)
+
 def parsing(IN):
     source = file_op.read_from_file(IN) 
     parsed = parser.Parser(source) 
     core = parsed.syntax_tree
 
     #inference node to type
-    Tinfer = inference.TypeInference()
-    Tinfer(core)
+    iftype, mgu = type_infer(core)
 
-    #Testing Tinfer attributes
-    print(ast_parsing.dump(core))
-    print("******************************************")
-    print("relations = ",Tinfer.relation)
-    print("cache = ", Tinfer.cache)
-    print("num load = ", Tinfer.num_load)
-    print("******************************************")
-    #Unify relation
-    print("After unified: ", unification.solve_system(Tinfer.relation))
-    print("******************************************")
-    #LLVM Builder
+    if DEBUG:
+        print(ast_parsing.dump(core))
+
     codegen = Emitter.LLVMEmitter(None,int32,[int32,int32])
     mod = codegen.visit(core)
 
@@ -50,9 +61,12 @@ if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser() 
     arg_parser.add_argument("--AST",required=False) 
     arg_parser.add_argument("--parse", required=False)
+    arg_parser.add_argument("--debug",required=False)
     arg_parser.add_argument("--input", required=True)
     arg_parser.add_argument("--output",required=False)
     args = arg_parser.parse_args()
+
+    DEBUG = args.debug
 
     if args.AST == "True":
         FILENAME_IN = args.input

@@ -117,6 +117,7 @@ class TypeInference(object):
         return type_right
  
     def visit_Assign(self, node, attrs = None):
+        #doesn't support subsequent assignment
         #Int/Float --> $ptr
         #node.value = Int/Float/Op
         dtype_value = self.visit(node.value)

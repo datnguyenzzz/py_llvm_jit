@@ -141,6 +141,8 @@ class LLVMEmitter(object):
 
             if is_array(func_arg):
                 zero,one,two = set_const(0), set_const(1), set_const(2) 
+                #getelementptr
+                #get the address of a subelement of an aggregate data structure
                 data = self._builder.gep(llvm_arg, [zero, zero], name=(arg_name + "_data")) 
                 dims = self._builder.gep(llvm_arg, [zero, one], name=(arg_name + "_dims")) 
                 shape = self._builder.get(llvm_arg, [zero, two], name=(arg_name + "_shape"))
@@ -154,15 +156,30 @@ class LLVMEmitter(object):
                 arg_ref = self._builder.alloca(to_llvm_type(func_arg)) 
                 self._builder.store(llvm_arg, arg_ref) 
                 self._locals[arg_name] = arg_ref
-                #print(f"{arg_name} - {llvm_arg} -> {arg_ref}")
+                #print(f"{arg_name} = {llvm_arg} -> {arg_ref}")
         
         if rettype is not void_type:
             self._locals['retval'] = self._builder.alloca(rettype, name="retval")
         
-        print(self._locals)
+        #print(self._locals)
         _ = list(map(self.visit, node.body)) 
         self.end_function()
     
+    def visit_Int(self,node):
+        print(type(node), node.dtype)
+    
+    def visit_Float(self,node):
+        print(type(node), node.dtype)
+    
+    def visit_Assign(self, node):
+        #doesn't support subsequent assignment
+        target_var = node.targets.id
+        if target_var in self._locals:
+            val = self.visit(node.value)  
+        else:
+            #print(vars(node.value)) 
+            val = self.visit(node.value)
+
     def generic_visit(self,node):
         return NotImplementedError
 
