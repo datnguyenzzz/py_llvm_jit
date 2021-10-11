@@ -14,22 +14,13 @@ from utils import file_op
 from optimizes import unification
 from LLVMIRBuilder import Emitter
 
-def build_AST_tree(IN, OUT):
-    source = file_op.read_from_file(IN)
-    ast_tree = ast_parsing.dump(source)
-
-    if OUT == None:
-        print(ast_tree)
-    else:
-        file_op.write_to_file(OUT, ast_tree)
-
 def type_infer(ast):
     Tinfer = inference.TypeInference()
     ftype = Tinfer.visit(ast)
     mgu = unification.solve_system(Tinfer.relation)
     equal = "#="
     infer_ftype = unification.apply(mgu[equal], ftype) 
-    if DEBUG:
+    if INFER:
         print("******************************************")
         print("relations = ",Tinfer.relation)
         print("cache = ", Tinfer.cache)
@@ -48,10 +39,13 @@ def parsing(IN):
     parsed = parser.Parser(source) 
     core = parsed.syntax_tree
 
+    if AST:
+        print(ast_parsing.dump(core))
+
     #inference node to type
     iftype, mgu = type_infer(core)
 
-    if DEBUG:
+    if PARSE:
         print(ast_parsing.dump(core))
 
     codegen = Emitter.LLVMEmitter(None,int32,[int32,int32])
@@ -61,19 +55,18 @@ if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser() 
     arg_parser.add_argument("--AST",required=False) 
     arg_parser.add_argument("--parse", required=False)
+    arg_parser.add_argument("--inference", required=False)
     arg_parser.add_argument("--debug",required=False)
     arg_parser.add_argument("--input", required=True)
     arg_parser.add_argument("--output",required=False)
     args = arg_parser.parse_args()
 
+    AST = args.AST
     DEBUG = args.debug
+    PARSE = args.parse 
+    INFER = args.inference
 
-    if args.AST == "True":
-        FILENAME_IN = args.input
-        FILENAME_OUT = args.output
-        build_AST_tree(FILENAME_IN, FILENAME_OUT)
-    
-    if args.parse == "True":
-        FILENAME_IN = args.input 
-        parsing(args.input)
+    FILENAME_IN = args.input
+    FILENAME_OUT = args.output
+    parsing(args.input)
 
