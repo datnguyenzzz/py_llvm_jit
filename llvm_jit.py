@@ -13,6 +13,7 @@ from AST import ast_parsing
 from utils import file_op
 from optimizes import unification
 from LLVMIRBuilder import Emitter
+from compiler import codegen
 
 def type_infer(ast):
     Tinfer = inference.TypeInference()
@@ -21,21 +22,14 @@ def type_infer(ast):
     equal = "#="
     infer_ftype = unification.apply(mgu[equal], ftype) 
     if INFER:
-        print("******************************************")
         print("relations = ",Tinfer.relation)
         print("cache = ", Tinfer.cache)
         print("num load = ", Tinfer.num_load)
-        print("******************************************")
-        #Unify relation
-        print("func equation before inference: ", ftype)
-        print("After unified: ", mgu) 
-        print("func equation after inference: ", infer_ftype)
-        print("******************************************")
+        print("Func equation before inference: ", ftype)
     
-    return (infer_ftype, mgu)
+    return (infer_ftype, mgu[equal])
 
-def parsing(IN):
-    source = file_op.read_from_file(IN) 
+def llvm_jit(source):
     parsed = parser.Parser(source) 
     core = parsed.syntax_tree
 
@@ -47,9 +41,12 @@ def parsing(IN):
 
     if PARSE:
         print(ast_parsing.dump(core))
+    
+    if INFER:
+        print("After unified: ", mgu) 
+        print("Func equation after inference: ", iftype)
 
-    codegen = Emitter.LLVMEmitter(None,int32,[int32,int32])
-    mod = codegen.visit(core)
+    return codegen.recompile(core, iftype, mgu)
 
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser() 
@@ -68,5 +65,7 @@ if __name__ == "__main__":
 
     FILENAME_IN = args.input
     FILENAME_OUT = args.output
-    parsing(args.input)
+    if FILENAME_IN:
+        source = file_op.read_from_file(FILENAME_IN) 
+        llvm_jit(source)
 
