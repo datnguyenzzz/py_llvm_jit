@@ -30,23 +30,26 @@ def type_infer(ast):
     return (infer_ftype, mgu[equal])
 
 def llvm_jit(source):
-    parsed = parser.Parser(source) 
-    core = parsed.syntax_tree
+    def wrapper(*args): #args of source
+        parsed = parser.Parser(source) 
+        core = parsed.syntax_tree
 
-    if AST:
-        print(ast_parsing.dump(core))
+        if AST:
+            print(ast_parsing.dump(core))
 
-    #inference node to type
-    iftype, mgu = type_infer(core)
+        #inference node to type
+        iftype, mgu = type_infer(core)
 
-    if PARSE:
-        print(ast_parsing.dump(core))
+        if PARSE:
+            print(ast_parsing.dump(core))
+        
+        if INFER:
+            print("After unified: ", mgu) 
+            print("Func equation after inference: ", iftype)
+
+        return codegen.recompile(list(args),core, iftype, mgu)
     
-    if INFER:
-        print("After unified: ", mgu) 
-        print("Func equation after inference: ", iftype)
-
-    return codegen.recompile(core, iftype, mgu)
+    return wrapper
 
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser() 
@@ -54,7 +57,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("--parse", required=False)
     arg_parser.add_argument("--inference", required=False)
     arg_parser.add_argument("--debug",required=False)
-    arg_parser.add_argument("--input", required=True)
+    arg_parser.add_argument("--input", required=False)
     arg_parser.add_argument("--output",required=False)
     args = arg_parser.parse_args()
 
@@ -68,4 +71,15 @@ if __name__ == "__main__":
     if FILENAME_IN:
         source = file_op.read_from_file(FILENAME_IN) 
         llvm_jit(source)
+    else:
+
+        @llvm_jit
+        def addup(n):
+            x = 1
+            n = 10
+            for i in range(n):
+                n += i + x
+            return n
+        
+        print(addup(10))
 
