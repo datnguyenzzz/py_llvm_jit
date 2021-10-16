@@ -24,12 +24,14 @@ def arg_py_type(arg):
         raise Exception(f'Type not supported {type(arg)}')
 
 def recompile(args, ast, infer_type, mgu):
-    type_arg = list(map(arg_py_type, args))
-    main_func = TFunc(args = type_arg, ret = TVar("$ret"))
+    type_args = list(map(arg_py_type, args))
+    main_func = TFunc(args = type_args, ret = TVar("$ret"))
 
     unified = unification.unify(infer_type, main_func)
     
     specialization = unification.merge(unified, mgu)
 
-    print(specialization)
+    spec_ret = unification.apply(specialization, TVar("$ret")) 
+    spec_args = [unification.apply(specialization, arg) for arg in type_args]
+
     return None
