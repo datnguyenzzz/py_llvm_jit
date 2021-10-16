@@ -146,11 +146,11 @@ class TypeInference(object):
         return type_args
 
     def visit_For(self, node, attrs = None):
-        for_id = self.visit(node.target, int32)
+        for_id = self.visit(node.target, int64)
         range_bounded = self.visit(node.iter)
         
-        self._relation.append(("#=",for_id,int32)) 
-        self._relation.extend([("#=",b,int32) for b in range_bounded])
+        self._relation.append(("#=",for_id,int64)) 
+        self._relation.extend([("#=",b,int64) for b in range_bounded])
         
         _ = list(map(self.visit, node.body))
         return None

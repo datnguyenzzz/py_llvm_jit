@@ -112,7 +112,7 @@ def merge(cp, substitution):
 
 def solve(relations):
     mgu = {} 
-    tmp = relations 
+    tmp = list(relations) 
     while len(tmp) > 0:
         (x,y) = tmp.pop() 
         cp = unify(x,y)

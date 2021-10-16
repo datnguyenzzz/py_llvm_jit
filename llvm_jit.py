@@ -20,6 +20,7 @@ def type_infer(ast):
     ftype = Tinfer.visit(ast)
     mgu = unification.solve_system(Tinfer.relation)
     equal = "#="
+
     infer_ftype = unification.apply(mgu[equal], ftype) 
     if INFER:
         print("relations = ",Tinfer.relation)
@@ -27,6 +28,19 @@ def type_infer(ast):
         print("num load = ", Tinfer.num_load)
         print("Func equation before inference: ", ftype)
     
+    if DEBUG:
+        print("mgu test")
+        for x in mgu[equal].keys():
+            print(type(x),type(mgu[equal][x]))
+        print("after infer")
+        for a in ftype.args:
+            print(type(a))
+        print(type(ftype.ret))
+
+        print("before infer")
+        for a in infer_ftype.args:
+            print(type(a))
+        print(type(infer_ftype.ret))
     return (infer_ftype, mgu[equal])
 
 def llvm_jit(source):
@@ -73,13 +87,19 @@ if __name__ == "__main__":
         llvm_jit(source)
     else:
 
-        @llvm_jit
-        def addup(n):
-            x = 1
-            n = 10
-            for i in range(n):
-                n += i + x
-            return n
+        #@llvm_jit
+        #def addup(a,b):
+        #    c = 0 
+        #    for i in range(a,b):
+        #        c = c + i
+        #    return c 
         
-        print(addup(10))
+        @llvm_jit
+        def addup(a,b):
+            c = a + b
+            return c
+        
+        a = 10 
+        b = 20 
+        print(addup(a,b))
 

@@ -25,5 +25,11 @@ def arg_py_type(arg):
 
 def recompile(args, ast, infer_type, mgu):
     type_arg = list(map(arg_py_type, args))
-    print(type_arg)
+    main_func = TFunc(args = type_arg, ret = TVar("$ret"))
+
+    unified = unification.unify(infer_type, main_func)
+    
+    specialization = unification.merge(unified, mgu)
+
+    print(specialization)
     return None
