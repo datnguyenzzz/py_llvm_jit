@@ -1,6 +1,8 @@
 import sys 
 sys.path.append("../")
 
+from functools import reduce 
+
 import numpy as np 
 
 from optimizes import unification
@@ -23,6 +25,22 @@ def arg_py_type(arg):
     else:
         raise Exception(f'Type not supported {type(arg)}')
 
+def determined(arg):
+    #define argument x is determined or not 
+
+    def _get_variables(x):
+        if isinstance(x, TCon):
+            return set() 
+        elif isinstance(x, TVar):
+            return set([x])
+        elif isinstance(x, TApp):
+            return _get_variables(x.fn) | _get_variables(x.arg) 
+        elif isinstance(x, TFunc):
+            return reduce(set.union, map(_get_variables, x.args)) | _get_variables(x.ret)
+    
+    tmp = _get_variables(arg)
+    return len(tmp) == 0
+
 def recompile(args, ast, infer_type, mgu):
     type_args = list(map(arg_py_type, args))
     main_func = TFunc(args = type_args, ret = TVar("$ret"))
@@ -33,5 +51,10 @@ def recompile(args, ast, infer_type, mgu):
 
     spec_ret = unification.apply(specialization, TVar("$ret")) 
     spec_args = [unification.apply(specialization, arg) for arg in type_args]
+
+    if determined(spec_ret) and all(map(determined, spec_args)):
+        print("Yay")
+    else:
+        raise Exception('Some argument has not been determined')
 
     return None
