@@ -31,7 +31,7 @@ class LLVMEmitter(object):
     #self._arg_types: Argument types 
     #self._module: Module for wrap function together 
 
-    def __init__(self, spec_types, ret_type, arg_types):
+    def __init__(self, spec_types, arg_types, ret_type):
         self._function = None 
         self._builder = None 
         self._locals = {} 
@@ -171,14 +171,28 @@ class LLVMEmitter(object):
     def visit_Float(self,node):
         print("FLOAT - TBH")
     
+    def visit_Var(self, node):
+        #must be declared 
+        return self.builder.load(self._locals[node.id])
+
+    def visit_BinOp(self,node):
+        print(vars(node))
+        op = node.op 
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        print("op =",op)
+        print("left =",left) 
+        print("right =",right)
+    
     def visit_Assign(self, node):
-        #doesn't support subsequent assignment
         target_var = node.targets.id
         if target_var in self._locals:
-            val = self.visit(node.value)  
+            #already allocated 
+            pass 
         else:
-            #print(vars(node.value)) 
-            val = self.visit(node.value)
+            #first time 
+            value = self.visit(node.value)
+            #memory allocate of value  
 
     def generic_visit(self,node):
         return NotImplementedError

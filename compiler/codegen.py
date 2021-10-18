@@ -7,6 +7,7 @@ import numpy as np
 
 from optimizes import unification
 from custom_types.basics import *
+from LLVMIRBuilder import Emitter
 
 FUNC_CACHE = {}
 
@@ -43,6 +44,10 @@ def determined(arg):
     tmp = _get_variables(arg)
     return len(tmp) == 0
 
+def code_gen(ast, specialization, spec_args, spec_ret):
+    llvm_code = Emitter.LLVMEmitter(specialization, spec_args, spec_ret)
+    llvm_code.visit(ast)
+
 def recompile(args, ast, infer_type, mgu):
     type_args = list(map(arg_py_type, args))
     main_func = TFunc(args = type_args, ret = TVar("$ret"))
@@ -60,7 +65,7 @@ def recompile(args, ast, infer_type, mgu):
         if func_name in FUNC_CACHE:
             return FUNC_CACHE[func_name](*args)
         else:
-            pass
+            llfunc = code_gen(ast, specialization, spec_args, spec_ret)
     else:
         raise Exception('Some argument has not been determined')
 
