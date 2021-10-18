@@ -173,16 +173,44 @@ class LLVMEmitter(object):
     
     def visit_Var(self, node):
         #must be declared 
-        return self.builder.load(self._locals[node.id])
+        context = node.ctx
+        if context == "#load":
+            return self.builder.load(self._locals[node.id])
+        elif context == "#store":
+            pass 
+        else:
+            raise Exception(f"Does not support {context} operation")
 
     def visit_BinOp(self,node):
-        print(vars(node))
+        #print(vars(node))
         op = node.op 
         left = self.visit(node.left)
         right = self.visit(node.right)
-        print("op =",op)
-        print("left =",left) 
-        print("right =",right)
+        #print("op =",op)
+        #print("left =",left,) 
+        #print("right =",right)
+        if op == "#add":
+            if left.type == int_type:
+                return self.builder.add(left, right)
+            else:
+                return self.builder.fadd(left,right)
+        elif op == "#sub":
+            if left.type == int_type:
+                return self.builder.sub(left, right)
+            else:
+                return self.builder.fsub(left,right)
+        elif op == "#mult":
+            if left.type == int_type:
+                return self.builder.mult(left, right)
+            else:
+                return self.builder.fmult(left,right)
+        elif op == "#div":
+            if left.type == int_type:
+                return self.builder.div(left, right)
+            else:
+                return self.builder.fdiv(left,right)
+        else:
+            raise Exception(f"Haven't support operation {op} yet")
     
     def visit_Assign(self, node):
         target_var = node.targets.id
@@ -192,6 +220,7 @@ class LLVMEmitter(object):
         else:
             #first time 
             value = self.visit(node.value)
+            print(value)
             #memory allocate of value  
 
     def generic_visit(self,node):
