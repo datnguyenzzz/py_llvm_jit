@@ -214,19 +214,18 @@ class LLVMEmitter(object):
     
     def visit_Assign(self, node):
         target_var = node.targets.id
+        llvm_var = None 
+        llvm_value = self.visit(node.value)
         if target_var in self._locals:
             #already allocated 
-            pass 
+            llvm_var = self._locals[target_var] 
         else:
             #first time 
-            llvm_value = self.visit(node.value)
-            #type of value --> type of var
             llvm_var = self.builder.alloca(llvm_value.type, name=target_var)
-            self.builder.store(llvm_value, llvm_var) 
-            self._locals[target_var] = llvm_var 
-            #print(llvm_var,"|", llvm_value)
-            #print(self._locals)
-            return llvm_var
+            
+        self.builder.store(llvm_value, llvm_var) 
+        self._locals[target_var] = llvm_var 
+        return llvm_var
 
     def generic_visit(self,node):
         return NotImplementedError
