@@ -7,7 +7,7 @@ import numpy as np
 from llvmlite import ir
 import llvmlite.binding as llvm
 
-from optimizes import unification
+from optimizes import unification,llvm_passes
 from custom_types.basics import *
 from LLVMIRBuilder import Emitter
 
@@ -59,9 +59,8 @@ def code_gen(ast, specialization, spec_args, spec_ret):
     llvm_code = Emitter.LLVMEmitter(specialization, spec_args, spec_ret, MODULE)
     llvm_code.visit(ast)
 
-    #create module
-    mod = llvm.parse_assembly(str(MODULE)) 
-    print(mod)
+    llvm_passes.tuning(MODULE)
+    #print(llvm_code.function)
 
 def recompile(args, ast, infer_type, mgu):
     type_args = list(map(arg_py_type, args))
