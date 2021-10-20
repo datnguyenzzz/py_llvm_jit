@@ -76,7 +76,7 @@ def code_gen(ast, specialization, spec_args, spec_ret):
     engine.finalize_object()
     engine.run_static_constructors()
 
-    print(mod)
+    return llvm_code.function
 
 def recompile(args, ast, infer_type, mgu):
     type_args = list(map(arg_py_type, args))
@@ -96,6 +96,8 @@ def recompile(args, ast, infer_type, mgu):
             return FUNC_CACHE[func_name](*args)
         else:
             llfunc = code_gen(ast, specialization, spec_args, spec_ret)
+            #already compile module 
+            #need return compiled function from module 
     else:
         raise Exception('Some argument has not been determined')
 
