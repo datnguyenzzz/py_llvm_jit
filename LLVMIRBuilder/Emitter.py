@@ -31,7 +31,7 @@ class LLVMEmitter(object):
     #self._arg_types: Argument types 
     #self._module: Module for wrap function together 
 
-    def __init__(self, spec_types, arg_types, ret_type):
+    def __init__(self, spec_types, arg_types, ret_type, chief_module):
         self._function = None 
         self._builder = None 
         self._locals = {} 
@@ -130,6 +130,7 @@ class LLVMEmitter(object):
             return self.generic_visit(node)
     
     def visit_FunctionDef(self, node):
+        #print(vars(node))
         rettype = to_llvm_type(self._ret_type)
         argtype = list(map(to_llvm_type, self._arg_types))
         fname = name_hashed(node.name, self._arg_types) 
@@ -164,6 +165,13 @@ class LLVMEmitter(object):
         #print(self._locals)
         _ = list(map(self.visit, node.body)) 
         self.end_function()
+    
+    def visit_Return(self, node):
+        llvm_value = self.visit(node.value)
+        if llvm_value.type != void_type:
+            self._builder.store(llvm_value, self._locals['retval'])
+        
+        self._builder.branch(self._exit_block)
     
     def visit_Int(self,node):
         print("INT - TBH")

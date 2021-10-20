@@ -4,12 +4,23 @@ sys.path.append("../")
 from functools import reduce 
 
 import numpy as np 
+from llvmlite import ir
+import llvmlite.binding as llvm
 
 from optimizes import unification
 from custom_types.basics import *
 from LLVMIRBuilder import Emitter
 
 FUNC_CACHE = {}
+
+# modules in the IR layer allow you to build and group functions together, 
+# modules in the binding layer give access to compilation, 
+# linking and execution of code. 
+# To distinguish between them, 
+# the module class in the binding layer is called ModuleRef 
+# as opposed to llvmlite.ir.Module.
+
+MODULE = ir.Module('pyjit')
 
 def arg_py_type(arg):
     if isinstance(arg, int) and arg <= sys.maxsize:
@@ -45,8 +56,12 @@ def determined(arg):
     return len(tmp) == 0
 
 def code_gen(ast, specialization, spec_args, spec_ret):
-    llvm_code = Emitter.LLVMEmitter(specialization, spec_args, spec_ret)
+    llvm_code = Emitter.LLVMEmitter(specialization, spec_args, spec_ret, MODULE)
     llvm_code.visit(ast)
+
+    #create module
+    mod = llvm.parse_assembly(str(MODULE)) 
+    print(mod)
 
 def recompile(args, ast, infer_type, mgu):
     type_args = list(map(arg_py_type, args))
