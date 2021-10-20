@@ -55,12 +55,28 @@ def determined(arg):
     tmp = _get_variables(arg)
     return len(tmp) == 0
 
+def create_execution_engine():
+    # Create an ExecutionEngine suitable for JIT code generation on
+    # the host CPU
+    target = llvm.Target.from_default_triple()
+    target_machine = target.create_target_machine() 
+    backing_mod = llvm.parse_assembly("")
+    engine = llvm.create_mcjit_compiler(backing_mod, target_machine)
+    
+    return engine
+
 def code_gen(ast, specialization, spec_args, spec_ret):
     llvm_code = Emitter.LLVMEmitter(specialization, spec_args, spec_ret, MODULE)
     llvm_code.visit(ast)
 
-    llvm_passes.tuning(MODULE)
-    #print(llvm_code.function)
+    mod = llvm_passes.tuning(MODULE)
+
+    engine = create_execution_engine() 
+    engine.add_module(mod)
+    engine.finalize_object()
+    engine.run_static_constructors()
+
+    print(mod)
 
 def recompile(args, ast, infer_type, mgu):
     type_args = list(map(arg_py_type, args))

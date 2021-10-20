@@ -32,4 +32,5 @@ def tuning(module):
     pass_manager.populate(pass_module)
 
     pass_module.run(mod)
-    print(mod)
+    
+    return mod
