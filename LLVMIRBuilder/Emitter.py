@@ -125,6 +125,9 @@ class LLVMEmitter(object):
     #Unconditional jump to the target
     def branch(self, next_block):
         self._builder.branch(next_block)
+    
+    def cbranch(self, cond, block_1, block_2):
+        self._builder.cbranch(cond, block_1, block_2)
         
     #positioning at end of block 
     def set_block(self, block):
@@ -198,24 +201,47 @@ class LLVMEmitter(object):
         return (args,None)
     
     def visit_For(self,node):
-        print("------for -- llvm ir-------")
+        #print("------for -- llvm ir-------")
         init_block = self.function.append_basic_block('for.init') 
         cond_block = self.function.append_basic_block('for.cond')
         body_block = self.function.append_basic_block('for.body') 
         end_block = self.function.append_basic_block('for.end')
         
+        #increament init
         self.branch(init_block)
         self.set_block(init_block)
         
         args,_ = self.visit(node.iter)
         start,end = args[0], args[1]
-        print(start) 
-        print(end)
-        
+        if len(args) == 2:
+            inc_size = ir.Constant(int_type, 1) 
+        else:
+            inc_size = args[2]
+        #print(start) 
+        #print(end)
+        #print(inc_size)
         inc = self.visit(node.target)
-        print(inc)
+        self._builder.store(start, inc)
+        #print(inc)
         
-        print("------for -- llvm ir-------")
+        #loop condition
+        self.branch(cond_block)
+        self.set_block(cond_block)
+        cond = self._builder.icmp_signed('<', self._builder.load(inc), end) 
+        self.cbranch(cond, body_block, end_block)
+        
+        # loop body
+        self.set_block(body_block)
+        _ = list(map(self.visit, node.body))
+        
+        # increment counter 
+        succ = self._builder.add(inc_size, self._builder.load(inc)) 
+        self._builder.store(succ, inc) 
+        
+        #exit the loop 
+        self.branch(cond_block)
+        self.set_block(end_block)
+        #print("------for -- llvm ir-------")
     
     def visit_Var(self, node):
         #print("------Var -- llvm ir-------")
