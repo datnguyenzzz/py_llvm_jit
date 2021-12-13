@@ -12,11 +12,7 @@ def addup(a,b):
 
 @llvm_jit
 def test(a,b):
-    c = 0
-    if a==b:
-        c = 1
-    else:
-        c = 2
+    c = 2
     return c
 
 #print(addup(1,8))

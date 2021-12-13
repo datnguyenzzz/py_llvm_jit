@@ -53,6 +53,9 @@ class TypeInference(object):
     def get_name(self):
         return TVar('$' + next(self._names)) 
     
+    def get_name_TCon(self):
+        return TCon('$' + next(self._names)) 
+    
     def visit(self, node, attrs = None):
         visit_name = f"visit_{type(node).__name__}" 
         if hasattr(self, visit_name):
@@ -69,12 +72,12 @@ class TypeInference(object):
         return node.dtype
     
     def visit_Int(self, node, attrs = None):
-        node.dtype = self.get_name() 
+        node.dtype = self.get_name_TCon() 
         self._num_load.append((node.dtype,int(node.n)))
         return node.dtype
     
     def visit_Float(self, node, attrs = None):
-        node.dtype = self.get_name() 
+        node.dtype = self.get_name_TCon() 
         self._num_load.append((node.dtype,float(node.n)))
         return node.dtype
     
@@ -117,16 +120,19 @@ class TypeInference(object):
         return type_right
  
     def visit_Assign(self, node, attrs = None):
+        #print("------ infer assign -------")
         #doesn't support subsequent assignment
         #Int/Float --> $ptr
         #node.value = Int/Float/Op
         dtype_value = self.visit(node.value)
+        #print(dtype_value)
         targets = node.targets
         if targets.id in self._cache:
             # y = x , x = $ptr => y = $ptr
             self._relation.append(("#=", dtype_value, self._cache[targets.id])) 
 
         _ = self.visit(node.targets, dtype_value)
+        #print("------ infer assign -------")
         return None
 
     def visit_args(self, args):

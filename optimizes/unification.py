@@ -85,6 +85,7 @@ def unify(f_1,f_2):
 
 def apply(cp, x):
     if isinstance(x, TCon):
+        #print("DEBUG - ",x)
         return x 
     elif isinstance(x, TApp):
         #cp ( fn(...)(args) )

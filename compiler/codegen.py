@@ -53,6 +53,11 @@ def determined(arg):
             return reduce(set.union, map(_get_variables, x.args)) | _get_variables(x.ret)
     
     tmp = _get_variables(arg)
+    
+    #print("-----debug------")
+    #print(arg) 
+    #print(len(tmp))
+    #print("-----debug------")
     return len(tmp) == 0
 
 def create_execution_engine():
@@ -76,7 +81,7 @@ def code_gen(ast, specialization, spec_args, spec_ret):
 
     return (llvm_code.function,engine)
 
-def recompile(args, ast, infer_type, mgu):
+def recompile(args, ast, infer_type, mgu, num_load):
     type_args = list(map(arg_py_type, list(args)))
     main_func = TFunc(args = type_args, ret = TVar("$ret"))
     unified = unification.unify(infer_type, main_func)
@@ -85,6 +90,14 @@ def recompile(args, ast, infer_type, mgu):
 
     spec_ret = unification.apply(specialization, TVar("$ret")) 
     spec_args = [unification.apply(specialization, arg) for arg in type_args]
+    
+    for x in num_load:
+        if x[0] == spec_ret:
+            if isinstance(x[1],int):
+                spec_ret = int64
+            else:
+                spec_ret = double64
+            break
     
     if determined(spec_ret) and all(map(determined, spec_args)):
         func_name = "".join([ast.name,str(hash(tuple(spec_args)))])

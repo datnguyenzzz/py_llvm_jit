@@ -18,7 +18,7 @@ from compiler import codegen
 AST = False
 DEBUG = False
 PARSE = True
-INFER = False
+INFER = True
 
 def type_infer(ast):
     Tinfer = inference.TypeInference()
@@ -47,7 +47,7 @@ def type_infer(ast):
         for a in infer_ftype.args:
             print(type(a))
         print(type(infer_ftype.ret))
-    return (infer_ftype, mgu[equal])
+    return (infer_ftype, mgu[equal], Tinfer.num_load)
 
 def llvm_jit(source):
     def wrapper(*args): #args of source
@@ -62,7 +62,7 @@ def llvm_jit(source):
             print(ast_parsing.dump(core))
 
         #inference node to type
-        iftype, mgu = type_infer(core)
+        iftype, mgu, num_load = type_infer(core)
 
         if PARSE:
             print("=============== PARSE =====================")
@@ -72,7 +72,7 @@ def llvm_jit(source):
             print("After unified: ", mgu) 
             print("Func equation after inference: ", iftype)
 
-        return codegen.recompile(args,core, iftype, mgu)
+        return codegen.recompile(args,core, iftype, mgu, num_load)
     
     return wrapper
 

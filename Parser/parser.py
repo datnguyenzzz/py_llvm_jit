@@ -190,7 +190,9 @@ class Parser(Visitor):
         #print("--------- AST IF -----------")
         test = self.visit(node.test) 
         body = self.visit(node.body[0]) 
-        orelse = self.visit(node.orelse[0]) 
+        orelse = None
+        if node.orelse:
+            orelse = self.visit(node.orelse[0]) 
         return If(test, body, orelse)
         #print("--------- AST IF -----------")
 
