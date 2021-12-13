@@ -118,8 +118,18 @@ class LLVMEmitter(object):
         else:
             self._builder.ret_void()
 
+    #add block to function
     def add_block(self, name):
         return self._function.append_basic_block(name)
+    
+    #Unconditional jump to the target
+    def branch(self, next_block):
+        self._builder.branch(next_block)
+        
+    #positioning at end of block 
+    def set_block(self, block):
+        self._block = block 
+        self._builder.position_at_end(block)
 
     #traverse thought AST tree 
     def visit(self, node):
@@ -171,13 +181,38 @@ class LLVMEmitter(object):
         if llvm_value.type != void_type:
             self._builder.store(llvm_value, self._locals['retval'])
         
-        self._builder.branch(self._exit_block)
+        self.branch(self._exit_block)
     
     def visit_Int(self,node):
-        print("INT - TBH")
+        return ir.Constant(int_type, node.n)
     
     def visit_Float(self,node):
-        print("FLOAT - TBH")
+        return ir.Constant(double_type, node.n)
+    
+    def visit_Call(self,node):
+        print("----------- Call llvm ir--------")
+        sz = len(node.args) 
+        print(sz)
+        args = [] 
+        for _arg in node.args:
+            arg = self.visit(_arg) 
+            print(arg)
+        
+        print("----------- Call llvm ir--------")
+    
+    def visit_For(self,node):
+        print("------for -- llvm ir-------")
+        print(node)
+        init_block = self.function.append_basic_block('for.init') 
+        cond_block = self.function.append_basic_block('for.cond')
+        body_block = self.function.append_basic_block('for.body') 
+        end_block = self.function.append_basic_block('for.end')
+        
+        self.branch(init_block)
+        self.set_block(init_block)
+        
+        args,_ = self.visit(node.iter)
+        print("------for -- llvm ir-------")
     
     def visit_Var(self, node):
         #must be declared 
@@ -229,7 +264,7 @@ class LLVMEmitter(object):
         else:
             #first time 
             llvm_var = self.builder.alloca(llvm_value.type, name=target_var)
-            
+        
         self.builder.store(llvm_value, llvm_var) 
         self._locals[target_var] = llvm_var 
         return llvm_var

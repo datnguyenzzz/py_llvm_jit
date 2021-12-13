@@ -86,8 +86,6 @@ def recompile(args, ast, infer_type, mgu):
     spec_ret = unification.apply(specialization, TVar("$ret")) 
     spec_args = [unification.apply(specialization, arg) for arg in type_args]
 
-    print("======================= DEBUG =====================")
-
     if determined(spec_ret) and all(map(determined, spec_args)):
         func_name = "".join([ast.name,str(hash(tuple(spec_args)))])
 
