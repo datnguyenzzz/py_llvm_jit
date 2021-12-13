@@ -190,19 +190,15 @@ class LLVMEmitter(object):
         return ir.Constant(double_type, node.n)
     
     def visit_Call(self,node):
-        print("----------- Call llvm ir--------")
         sz = len(node.args) 
-        print(sz)
         args = [] 
         for _arg in node.args:
-            arg = self.visit(_arg) 
-            print(arg)
-        
-        print("----------- Call llvm ir--------")
+            args.append(self.visit(_arg))
+            
+        return (args,None)
     
     def visit_For(self,node):
         print("------for -- llvm ir-------")
-        print(node)
         init_block = self.function.append_basic_block('for.init') 
         cond_block = self.function.append_basic_block('for.cond')
         body_block = self.function.append_basic_block('for.body') 
@@ -212,17 +208,29 @@ class LLVMEmitter(object):
         self.set_block(init_block)
         
         args,_ = self.visit(node.iter)
+        start,end = args[0], args[1]
+        print(start) 
+        print(end)
+        
+        inc = self.visit(node.target)
+        print(inc)
+        
         print("------for -- llvm ir-------")
     
     def visit_Var(self, node):
+        #print("------Var -- llvm ir-------")
         #must be declared 
         context = node.ctx
         if context == "#load":
             return self.builder.load(self._locals[node.id])
         elif context == "#store":
-            pass 
+            id_name = node.id 
+            local_v = self._builder.alloca(int_type, name=id_name)
+            self._locals[id_name] = local_v
+            return local_v
         else:
             raise Exception(f"Does not support {context} operation")
+        #print("------Var -- llvm ir-------")
 
     def visit_BinOp(self,node):
         #print(vars(node))
