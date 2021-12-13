@@ -5,6 +5,7 @@ class JitWrapper:
     def __init__(self, llfunc, engine):
         self._llfunc = llfunc 
         self._engine = engine 
+        self.callable_func = None
     
     def jit_type(self, llvm_type):
         if isinstance(llvm_type, ir.IntType):
@@ -34,7 +35,9 @@ class JitWrapper:
         return runnable_type
     
     def jit_module(self):
-        runnable_func = self.jit_func()
+        self.callable_func = self.jit_func()
+        runnable_func = self.dispatcher(self.callable_func)
+        print(runnable_func)
         return runnable_func 
     
     def jit_func(self):
@@ -44,9 +47,19 @@ class JitWrapper:
         runnable_ret = self.jit_type(llvm_ret)
         runnable_args = list(map(self.jit_type, llvm_args))
         
-        cfunc = ctypes.CFUNCTYPE(runnable_ret, *runnable_args)
+        cfunctype = ctypes.CFUNCTYPE(runnable_ret, *runnable_args)
         func_address = self._engine.get_function_address(self._llfunc.name)
         
-        runnable_func = cfunc(func_address)
+        runnable_func = cfunctype(func_address)
         runnable_func.__name__ = self._llfunc.name
         return runnable_func
+
+    def dispatcher(self, fn):
+        def call(*args):
+            print("-----decor------")
+            print(args)
+            print(fn._argtypes_)
+            print("-----decor------")
+         
+        call.__name__ = fn.__name__
+        return call

@@ -73,15 +73,12 @@ def code_gen(ast, specialization, spec_args, spec_ret):
 
     engine = create_execution_engine() 
     engine.add_module(mod)
-    engine.finalize_object()
-    engine.run_static_constructors()
 
     return (llvm_code.function,engine)
 
 def recompile(args, ast, infer_type, mgu):
-    type_args = list(map(arg_py_type, args))
+    type_args = list(map(arg_py_type, list(args)))
     main_func = TFunc(args = type_args, ret = TVar("$ret"))
-
     unified = unification.unify(infer_type, main_func)
     
     specialization = unification.merge(unified, mgu)
@@ -98,16 +95,10 @@ def recompile(args, ast, infer_type, mgu):
             llfunc,engine = code_gen(ast, specialization, spec_args, spec_ret)
             #already compile module 
             #need return compiled function from module 
-            #print("func name") 
-            #print(func_name)
-            #print("spec args") 
-            #print(spec_args)
-            #print("func in llvm") 
             # translate to runnable function
-            p = jit_wrapper.JitWrapper(llfunc,engine)
-            print(p.jit_module())
-            FUNC_CACHE[func_name] = llfunc
+            wrap = jit_wrapper.JitWrapper(llfunc,engine)
+            runnable_func = wrap.jit_module()
+            FUNC_CACHE[func_name] = runnable_func
+            return runnable_func(*args)
     else:
         raise Exception('Some argument has not been determined')
-
-    return None

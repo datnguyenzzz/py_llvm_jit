@@ -61,7 +61,7 @@ def llvm_jit(source):
             print("After unified: ", mgu) 
             print("Func equation after inference: ", iftype)
 
-        return codegen.recompile(list(args),core, iftype, mgu)
+        return codegen.recompile(args,core, iftype, mgu)
     
     return wrapper
 
@@ -99,7 +99,7 @@ if __name__ == "__main__":
             c = a + b
             return c
         
-        a = 10.2 
-        b = 20.5 
+        a = 10
+        b = 20 
         print(addup(a,b))
 

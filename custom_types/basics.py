@@ -28,7 +28,7 @@ class TVar(object):
         return hash(self._value)
     
     def __repr__(self):
-        return self._value
+        return f"TVar {self._value}"
 
 #Constructor: int32, int64, ...
 class TCon(object):
@@ -53,7 +53,7 @@ class TCon(object):
             return False
     
     def __repr__(self):
-        return self._value
+        return f"TCon {self._value}"
 
 class TApp(object):
     def __init__(self, fn, arg):
