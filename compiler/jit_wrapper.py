@@ -1,5 +1,6 @@
 from llvmlite import ir
 import ctypes
+import numpy as np
 
 class JitWrapper:
     def __init__(self, llfunc, engine):
@@ -37,7 +38,6 @@ class JitWrapper:
     def jit_module(self):
         self.callable_func = self.jit_func()
         runnable_func = self.dispatcher(self.callable_func)
-        print(runnable_func)
         return runnable_func 
     
     def jit_func(self):
@@ -53,13 +53,20 @@ class JitWrapper:
         runnable_func = cfunctype(func_address)
         runnable_func.__name__ = self._llfunc.name
         return runnable_func
+    
+    def jit_arg(self, arg, value):
+        if isinstance(value, np.ndarray):
+            pass 
+        else:
+            return value
 
     def dispatcher(self, fn):
         def call(*args):
-            print("-----decor------")
-            print(args)
-            print(fn._argtypes_)
-            print("-----decor------")
+            c_argtypes = list(fn._argtypes_) 
+            value_args = list(args)
+            #dispatch c_arg <-> value_arg
+            runnable_args = list(map(self.jit_arg, c_argtypes, value_args))
+            return fn(*runnable_args)
          
         call.__name__ = fn.__name__
         return call

@@ -1,6 +1,8 @@
-def addup(n):
-    x = 1
-    n = 1.5
-    for i in range(n):
-        n += i + x
-    return n
+from llvm_jit import llvm_jit
+
+@llvm_jit
+def addup(a,b):
+    c = a + b 
+    return c
+
+print(addup(5.2, 3.3))

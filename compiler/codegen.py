@@ -96,6 +96,9 @@ def recompile(args, ast, infer_type, mgu):
             #already compile module 
             #need return compiled function from module 
             # translate to runnable function
+            print("=============== LLVM FUNC =====================")
+            print(llfunc)
+            print("=============== RESULT =====================")
             wrap = jit_wrapper.JitWrapper(llfunc,engine)
             runnable_func = wrap.jit_module()
             FUNC_CACHE[func_name] = runnable_func

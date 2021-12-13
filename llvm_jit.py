@@ -15,6 +15,11 @@ from optimizes import unification
 from LLVMIRBuilder import Emitter
 from compiler import codegen
 
+AST = True
+DEBUG = False
+PARSE = True
+INFER = False
+
 def type_infer(ast):
     Tinfer = inference.TypeInference()
     ftype = Tinfer.visit(ast)
@@ -49,12 +54,14 @@ def llvm_jit(source):
         core = parsed.syntax_tree
 
         if AST:
+            print("=============== AST =====================")
             print(ast_parsing.dump(core))
 
         #inference node to type
         iftype, mgu = type_infer(core)
 
         if PARSE:
+            print("=============== PARSE =====================")
             print(ast_parsing.dump(core))
         
         if INFER:
@@ -71,35 +78,10 @@ if __name__ == "__main__":
     arg_parser.add_argument("--parse", required=False)
     arg_parser.add_argument("--inference", required=False)
     arg_parser.add_argument("--debug",required=False)
-    arg_parser.add_argument("--input", required=False)
-    arg_parser.add_argument("--output",required=False)
     args = arg_parser.parse_args()
 
-    AST = args.AST
+    AST = True
     DEBUG = args.debug
     PARSE = args.parse 
     INFER = args.inference
-
-    FILENAME_IN = args.input
-    FILENAME_OUT = args.output
-    if FILENAME_IN:
-        source = file_op.read_from_file(FILENAME_IN) 
-        llvm_jit(source)
-    else:
-
-        #@llvm_jit
-        #def addup(a,b):
-        #    c = 0 
-        #    for i in range(a,b):
-        #        c = c + i
-        #    return c 
-        
-        @llvm_jit
-        def addup(a,b):
-            c = a + b
-            return c
-        
-        a = 10
-        b = 20 
-        print(addup(a,b))
 
