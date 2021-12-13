@@ -15,7 +15,7 @@ from optimizes import unification
 from LLVMIRBuilder import Emitter
 from compiler import codegen
 
-AST = True
+AST = False
 DEBUG = False
 PARSE = True
 INFER = False

@@ -155,18 +155,24 @@ class TypeInference(object):
         _ = list(map(self.visit, node.body))
         return None
     
-    def visit_Compare(self, node, attrs = None):
+    def visit_If(self, node, attrs = None):
+        #print("-----if infer--------")
+        _ = self.visit(node.body) 
+        _ = self.visit(node.orelse)
+        #print("-----if infer--------")
+    
+    #def visit_Compare(self, node, attrs = None):
         #left ops comparetors 
         # 0 <= i < n <=> 0 [<=, <] [i,n]
-        left = [self.visit(node.left)]
-        comparators = list(map(self.visit, node.comparators)) 
-        left.extend(comparators)
-        ops = node.ops 
-        rel = [(ops[i],left[i],left[i+1]) for i in range(len(ops))] 
-        for r in rel:
-            self._relation.append(r)
+    #    left = [self.visit(node.left)]
+    #    comparators = list(map(self.visit, node.comparators)) 
+    #    left.extend(comparators)
+    #    ops = node.ops 
+    #    rel = [(ops[i],left[i],left[i+1]) for i in range(len(ops))] 
+    #    for r in rel:
+    #        self._relation.append(r)
 
-        return None
+    #    return None
     
     def visit_While(self, node, attrs = None):
         _ = self.visit(node.test)

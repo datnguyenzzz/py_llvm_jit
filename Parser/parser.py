@@ -188,7 +188,6 @@ class Parser(Visitor):
 
     def visit_If(self, node):
         #print("--------- AST IF -----------")
-        print(vars(node))
         test = self.visit(node.test) 
         body = self.visit(node.body[0]) 
         orelse = self.visit(node.orelse[0]) 
