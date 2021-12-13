@@ -99,7 +99,7 @@ if __name__ == "__main__":
             c = a + b
             return c
         
-        a = 10 
-        b = 20 
+        a = 10.2 
+        b = 20.5 
         print(addup(a,b))
 

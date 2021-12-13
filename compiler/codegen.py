@@ -1,5 +1,4 @@
 import sys 
-sys.path.append("../")
 
 from functools import reduce 
 
@@ -10,6 +9,7 @@ import llvmlite.binding as llvm
 from optimizes import unification,llvm_passes
 from custom_types.basics import *
 from LLVMIRBuilder import Emitter
+from . import jit_wrapper
 
 FUNC_CACHE = {}
 
@@ -76,7 +76,7 @@ def code_gen(ast, specialization, spec_args, spec_ret):
     engine.finalize_object()
     engine.run_static_constructors()
 
-    return llvm_code.function
+    return (llvm_code.function,engine)
 
 def recompile(args, ast, infer_type, mgu):
     type_args = list(map(arg_py_type, args))
@@ -95,9 +95,18 @@ def recompile(args, ast, infer_type, mgu):
         if func_name in FUNC_CACHE:
             return FUNC_CACHE[func_name](*args)
         else:
-            llfunc = code_gen(ast, specialization, spec_args, spec_ret)
+            llfunc,engine = code_gen(ast, specialization, spec_args, spec_ret)
             #already compile module 
             #need return compiled function from module 
+            #print("func name") 
+            #print(func_name)
+            #print("spec args") 
+            #print(spec_args)
+            #print("func in llvm") 
+            # translate to runnable function
+            p = jit_wrapper.JitWrapper(llfunc,engine)
+            print(p.jit_module())
+            FUNC_CACHE[func_name] = llfunc
     else:
         raise Exception('Some argument has not been determined')
 
