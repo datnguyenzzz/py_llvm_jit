@@ -1,12 +1,23 @@
 from llvm_jit import llvm_jit
 
 @llvm_jit
-def func(a,b):
+def addup(a,b):
+    step = 2
     c = a + b 
     
-    for i in range(a,b,2):
+    for i in range(a,b,step):
         c = c + i 
     
     return c
 
-print(func(1,8))
+@llvm_jit
+def test(a,b):
+    c = 0
+    if a==b:
+        c = 1
+    else:
+        c = 2
+    return c
+
+#print(addup(1,8))
+print(test(2,5))

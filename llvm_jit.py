@@ -25,13 +25,14 @@ def type_infer(ast):
     ftype = Tinfer.visit(ast)
     mgu = unification.solve_system(Tinfer.relation)
     equal = "#="
-
-    infer_ftype = unification.apply(mgu[equal], ftype) 
+    
     if INFER:
         print("relations = ",Tinfer.relation)
         print("cache = ", Tinfer.cache)
         print("num load = ", Tinfer.num_load)
         print("Func equation before inference: ", ftype)
+
+    infer_ftype = unification.apply(mgu[equal], ftype) 
     
     if DEBUG:
         print("mgu test")
@@ -51,6 +52,9 @@ def type_infer(ast):
 def llvm_jit(source):
     def wrapper(*args): #args of source
         parsed = parser.Parser(source) 
+        #print("---------------DEBUG------------")
+        #print(ast_parsing.dump(parsed._ast))
+        #print("---------------DEBUG------------")
         core = parsed.syntax_tree
 
         if AST:

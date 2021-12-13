@@ -186,7 +186,15 @@ class Parser(Visitor):
             step = Int(1) 
         return Slice(lower,upper,step)
 
-    
+    def visit_If(self, node):
+        #print("--------- AST IF -----------")
+        print(vars(node))
+        test = self.visit(node.test) 
+        body = self.visit(node.body[0]) 
+        orelse = self.visit(node.orelse[0]) 
+        return If(test, body, orelse)
+        #print("--------- AST IF -----------")
+
 if __name__ == "__main__":
     def test_func(x,y):
         a = 123
