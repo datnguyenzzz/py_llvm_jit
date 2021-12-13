@@ -194,7 +194,6 @@ class LLVMEmitter(object):
         op = node.op 
         left = self.visit(node.left)
         right = self.visit(node.right)
-        #print("op =",op)
         #print("left =",left,) 
         #print("right =",right)
         if op == "#add":
@@ -209,12 +208,12 @@ class LLVMEmitter(object):
                 return self.builder.fsub(left,right)
         elif op == "#mult":
             if left.type == int_type:
-                return self.builder.mult(left, right)
+                return self.builder.mul(left, right)
             else:
-                return self.builder.fmult(left,right)
+                return self.builder.fmul(left,right)
         elif op == "#div":
             if left.type == int_type:
-                return self.builder.div(left, right)
+                return self.builder.sdiv(left, right)
             else:
                 return self.builder.fdiv(left,right)
         else:
