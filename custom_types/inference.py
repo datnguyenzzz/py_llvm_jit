@@ -72,13 +72,15 @@ class TypeInference(object):
         return node.dtype
     
     def visit_Int(self, node, attrs = None):
-        node.dtype = self.get_name_TCon() 
+        node.dtype = self.get_name() 
         self._num_load.append((node.dtype,int(node.n)))
+        self._relation.append(("#=", node.dtype, int64))
         return node.dtype
     
     def visit_Float(self, node, attrs = None):
-        node.dtype = self.get_name_TCon() 
+        node.dtype = self.get_name() 
         self._num_load.append((node.dtype,float(node.n)))
+        self._relation.append(("#=", node.dtype, float32))
         return node.dtype
     
     def visit_List(self, node, attrs = None):
@@ -161,10 +163,10 @@ class TypeInference(object):
         _ = list(map(self.visit, node.body))
         return None
     
-    def visit_If(self, node, attrs = None):
+    #def visit_If(self, node, attrs = None):
         #print("-----if infer--------")
-        _ = self.visit(node.body) 
-        _ = self.visit(node.orelse)
+        #_ = self.visit(node.body) 
+        #_ = self.visit(node.orelse)
         #print("-----if infer--------")
     
     #def visit_Compare(self, node, attrs = None):

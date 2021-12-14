@@ -302,6 +302,30 @@ class LLVMEmitter(object):
         self.builder.store(llvm_value, llvm_var) 
         self._locals[target_var] = llvm_var 
         return llvm_var
+    
+    def visit_If(self,node):
+        print("--------- llvm if -----------------")
+        cond = self.visit(node.test)
+        
+        with self._builder.if_else(cond) as (then, orelse):
+            with then:
+                _ = self.visit(node.body) 
+            with orelse:
+                _ = self.visit(node.orelse) 
+        
+        print("--------- llvm if -----------------")
+        
+    def visit_Compare(self,node):
+        #print("------------- llvm cond ----------------")
+        #print(vars(node))
+        left_value = self.visit(node.left) 
+        right_value = self.visit(node.comparators[0])
+        op = node.ops[0]
+        #print(left_load)
+        #print(op)
+        #print(right_load)
+        return self._builder.icmp_signed(op, left_value, right_value) 
+        #print("------------- llvm cond ----------------")
 
     def generic_visit(self,node):
         return NotImplementedError

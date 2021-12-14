@@ -91,14 +91,6 @@ def recompile(args, ast, infer_type, mgu, num_load):
     spec_ret = unification.apply(specialization, TVar("$ret")) 
     spec_args = [unification.apply(specialization, arg) for arg in type_args]
     
-    for x in num_load:
-        if x[0] == spec_ret:
-            if isinstance(x[1],int):
-                spec_ret = int64
-            else:
-                spec_ret = double64
-            break
-    
     if determined(spec_ret) and all(map(determined, spec_args)):
         func_name = "".join([ast.name,str(hash(tuple(spec_args)))])
 

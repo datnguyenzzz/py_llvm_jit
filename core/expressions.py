@@ -5,8 +5,8 @@ ops = {ast.Add: "#add", ast.Sub: "#sub", ast.Mult: "#mult",
        ast.LShift: "#l_shift", ast.RShift: "#r_shift",
        ast.BitOr: "#bit_or", ast.BitAnd: "#bit_and", ast.BitXor: "#bit_xor",
        ast.And: "#and", ast.Or: "#or", ast.Not: "#not",
-       ast.Eq: "#=", ast.NotEq: "#!=", ast.Lt : "#<", ast.LtE: "#<=",
-       ast.Gt: "#>", ast.GtE: "#>=", ast.Is : "#is", ast.IsNot: "#isnot",
+       ast.Eq: "==", ast.NotEq: "!=", ast.Lt : "<", ast.LtE: "<=",
+       ast.Gt: ">", ast.GtE: ">=", ast.Is : "#is", ast.IsNot: "#isnot",
        ast.In: "#in", ast.NotIn: "#notin"}
 
 class UnaryOp(ast.AST):
