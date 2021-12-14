@@ -1,13 +1,21 @@
-from llvm_jit import llvm_jit
+from llvm_jit import py_llvm_jit
 import time
 
-@llvm_jit
+@py_llvm_jit(AST=False, PARSE=False, INFER=True, LLFUNC=False)
 def addup(a,b):
     step = 1
+    
+    f = 3 
+    e = f 
+    a = e 
+    
+    c = 100
+    b = c
     c = a + b 
     
+    
     for i in range(a,b,step):
-        if (a+b+i)%2==0:
+        if (a+b+i)%2==(a+i)%2:
             c = c + i
         else:
             c = c - i 
@@ -15,6 +23,4 @@ def addup(a,b):
     return c
 
 
-s = time.time()
-print(addup(1,20))
-print(time.time() - s)
+print(addup(1,100))

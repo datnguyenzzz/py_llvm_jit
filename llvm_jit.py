@@ -19,7 +19,7 @@ AST = False
 DEBUG = False
 PARSE = False
 INFER = False
-LLFUNC = False
+LLFUNC = True
 
 def type_infer(ast):
     Tinfer = inference.TypeInference()
@@ -27,7 +27,7 @@ def type_infer(ast):
     mgu = unification.solve_system(Tinfer.relation)
     equal = "#="
     
-    if INFER:
+    if DEBUG:
         print("relations = ",Tinfer.relation)
         print("cache = ", Tinfer.cache)
         print("num load = ", Tinfer.num_load)
@@ -48,34 +48,41 @@ def type_infer(ast):
         for a in infer_ftype.args:
             print(type(a))
         print(type(infer_ftype.ret))
-    return (infer_ftype, mgu[equal], Tinfer.num_load)
+    return (infer_ftype, mgu[equal], Tinfer.relation)
 
-def llvm_jit(source):
-    def wrapper(*args): #args of source
-        parsed = parser.Parser(source) 
-        #print("---------------DEBUG------------")
-        #print(ast_parsing.dump(parsed._ast))
-        #print("---------------DEBUG------------")
-        core = parsed.syntax_tree
+def py_llvm_jit(AST, PARSE, INFER, LLFUNC):
+    def llvm_jit(source):
+        def wrapper(*args): #args of source
+            parsed = parser.Parser(source) 
+            #print("---------------DEBUG------------")
+            #print(ast_parsing.dump(parsed._ast))
+            #print("---------------DEBUG------------")
+            core = parsed.syntax_tree
 
-        if AST:
-            print("=============== AST =====================")
-            print(ast_parsing.dump(core))
+            if AST:
+                print("=============== AST =====================")
+                print(ast_parsing.dump(core))
 
-        #inference node to type
-        iftype, mgu, num_load = type_infer(core)
+            #inference node to type
+            iftype, mgu, bef_uni = type_infer(core)
 
-        if PARSE:
-            print("=============== PARSE =====================")
-            print(ast_parsing.dump(core))
+            if PARSE:
+                print("=============== PARSE =====================")
+                print(ast_parsing.dump(core))
+            
+            if INFER:
+                print("Before unified: ") 
+                for x in bef_uni:
+                    print("\t",x[1], " = ", x[2])
+                print("After unified: ") 
+                for k in mgu.keys():
+                    print("\t", k, " = ", mgu[k])
+                print("Func equation after inference: ", iftype)
+
+            return codegen.recompile(args,core, iftype, mgu, LLFUNC)
         
-        if INFER:
-            print("After unified: ", mgu) 
-            print("Func equation after inference: ", iftype)
-
-        return codegen.recompile(args,core, iftype, mgu, LLFUNC)
-    
-    return wrapper
+        return wrapper
+    return llvm_jit
 
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser() 
