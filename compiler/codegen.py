@@ -81,7 +81,7 @@ def code_gen(ast, specialization, spec_args, spec_ret):
 
     return (llvm_code.function,engine)
 
-def recompile(args, ast, infer_type, mgu, num_load):
+def recompile(args, ast, infer_type, mgu, LLFUNC):
     type_args = list(map(arg_py_type, list(args)))
     main_func = TFunc(args = type_args, ret = TVar("$ret"))
     unified = unification.unify(infer_type, main_func)
@@ -101,9 +101,10 @@ def recompile(args, ast, infer_type, mgu, num_load):
             #already compile module 
             #need return compiled function from module 
             # translate to runnable function
-            print("=============== LLVM FUNC =====================")
-            print(llfunc)
-            print("=============== RESULT =====================")
+            if LLFUNC:
+                print("=============== LLVM FUNC =====================")
+                print(llfunc)
+                print("=============== RESULT =====================")
             wrap = jit_wrapper.JitWrapper(llfunc,engine)
             runnable_func = wrap.jit_module()
             FUNC_CACHE[func_name] = runnable_func

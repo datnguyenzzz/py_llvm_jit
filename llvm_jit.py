@@ -17,8 +17,9 @@ from compiler import codegen
 
 AST = False
 DEBUG = False
-PARSE = True
-INFER = True
+PARSE = False
+INFER = False
+LLFUNC = False
 
 def type_infer(ast):
     Tinfer = inference.TypeInference()
@@ -72,7 +73,7 @@ def llvm_jit(source):
             print("After unified: ", mgu) 
             print("Func equation after inference: ", iftype)
 
-        return codegen.recompile(args,core, iftype, mgu, num_load)
+        return codegen.recompile(args,core, iftype, mgu, LLFUNC)
     
     return wrapper
 

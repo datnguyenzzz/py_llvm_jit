@@ -285,6 +285,11 @@ class LLVMEmitter(object):
                 return self.builder.sdiv(left, right)
             else:
                 return self.builder.fdiv(left,right)
+        elif op == "#mod":
+            if left.type == int_type:
+                return self.builder.srem(left, right)
+            else:
+                raise Exception(f"Haven't support remainder for float")
         else:
             raise Exception(f"Haven't support operation {op} yet")
     
@@ -304,7 +309,6 @@ class LLVMEmitter(object):
         return llvm_var
     
     def visit_If(self,node):
-        print("--------- llvm if -----------------")
         cond = self.visit(node.test)
         
         with self._builder.if_else(cond) as (then, orelse):
@@ -313,7 +317,6 @@ class LLVMEmitter(object):
             with orelse:
                 _ = self.visit(node.orelse) 
         
-        print("--------- llvm if -----------------")
         
     def visit_Compare(self,node):
         #print("------------- llvm cond ----------------")
