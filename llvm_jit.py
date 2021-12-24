@@ -50,7 +50,7 @@ def type_infer(ast):
         print(type(infer_ftype.ret))
     return (infer_ftype, mgu[equal], Tinfer.relation)
 
-def py_llvm_jit(AST, PARSE, INFER, LLFUNC):
+def py_llvm_jit(PARSE, LLFUNC):
     def llvm_jit(source):
         def wrapper(*args): #args of source
             parsed = parser.Parser(source) 

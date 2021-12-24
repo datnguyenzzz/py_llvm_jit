@@ -10,6 +10,7 @@ from optimizes import unification,llvm_passes
 from custom_types.basics import *
 from LLVMIRBuilder import Emitter
 from . import jit_wrapper
+import time
 
 FUNC_CACHE = {}
 
@@ -104,10 +105,16 @@ def recompile(args, ast, infer_type, mgu, LLFUNC):
             if LLFUNC:
                 print("=============== LLVM FUNC =====================")
                 print(llfunc)
-                print("=============== RESULT =====================")
             wrap = jit_wrapper.JitWrapper(llfunc,engine)
             runnable_func = wrap.jit_module()
             FUNC_CACHE[func_name] = runnable_func
-            return runnable_func(*args)
+            s = time.time()
+            ans = runnable_func(*args)
+            exec_time = time.time() - s
+            
+            print("=============== TIME EXEC =====================")
+            print(exec_time)
+            print("=============== RESULT ========================")
+            return ans
     else:
         raise Exception('Some argument has not been determined')

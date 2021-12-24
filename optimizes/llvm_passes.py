@@ -31,12 +31,12 @@ def tuning(module):
     pass_module = llvm.ModulePassManager() 
 
     #optional optimization
-    #pass_module.add_constant_merge_pass()
-    #pass_module.add_dead_code_elimination_pass()
-    #pass_module.add_global_dce_pass()
-    #pass_module.add_global_optimizer_pass()
-    #pass_module.add_cfg_simplification_pass()
-    #pass_module.add_licm_pass()
+    pass_module.add_constant_merge_pass()
+    pass_module.add_dead_code_elimination_pass()
+    pass_module.add_global_dce_pass()
+    pass_module.add_global_optimizer_pass()
+    pass_module.add_cfg_simplification_pass()
+    pass_module.add_licm_pass()
     pass_manager.populate(pass_module)
 
     pass_module.run(mod)

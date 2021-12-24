@@ -217,12 +217,9 @@ class LLVMEmitter(object):
             inc_size = ir.Constant(int_type, 1) 
         else:
             inc_size = args[2]
-        #print(start) 
-        #print(end)
-        #print(inc_size)
+            
         inc = self.visit(node.target)
         self._builder.store(start, inc)
-        #print(inc)
         
         #loop condition
         self.branch(cond_block)

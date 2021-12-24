@@ -47,10 +47,8 @@ class JitWrapper:
         runnable_ret = self.jit_type(llvm_ret)
         runnable_args = list(map(self.jit_type, llvm_args))
         
-        cfunctype = ctypes.CFUNCTYPE(runnable_ret, *runnable_args)
         func_address = self._engine.get_function_address(self._llfunc.name)
-        
-        runnable_func = cfunctype(func_address)
+        runnable_func = ctypes.CFUNCTYPE(runnable_ret, *runnable_args)(func_address)
         runnable_func.__name__ = self._llfunc.name
         return runnable_func
     
