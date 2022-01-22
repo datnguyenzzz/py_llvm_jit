@@ -44,6 +44,24 @@ class Float(ast.AST):
     @property
     def fields(self):
         return self._fields
+    
+class Str(ast.AST):
+    def __init__(self, s, typ=None):
+        self._s = s 
+        self._type = typ 
+        self._fields = ["s"]
+    
+    @property 
+    def s(self):
+        return self._s
+
+    @s.setter 
+    def s(self,new_s):
+        self._s = new_s
+    
+    @property
+    def fields(self):
+        return self._fields
 
 class Bool(ast.AST):
     def __init__(self, n):

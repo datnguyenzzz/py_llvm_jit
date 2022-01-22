@@ -6,6 +6,7 @@ sys.path.append("../")
 
 from LLVMIRBuilder.LLVM_types import *
 
+from core.expressions import *
 from collections import defaultdict
 from llvmlite import ir
 
@@ -180,17 +181,24 @@ class LLVMEmitter(object):
         self.end_function()
     
     def visit_Return(self, node):
+        #print("-------------- <llvm return> -----------------------")
+        #print(node)
+        #print(vars(node.value))
         llvm_value = self.visit(node.value)
         if llvm_value.type != void_type:
             self._builder.store(llvm_value, self._locals['retval'])
         
         self.branch(self._exit_block)
+        #print("-------------- </llvm return> -----------------------")
     
     def visit_Int(self,node):
         return ir.Constant(int_type, node.n)
     
     def visit_Float(self,node):
         return ir.Constant(double_type, node.n)
+    
+    def visit_Str(self, node):
+        return ir.Constant(string_type(len(node.s)), node.s)
     
     def visit_Call(self,node):
         sz = len(node.args) 
@@ -296,7 +304,7 @@ class LLVMEmitter(object):
         llvm_value = self.visit(node.value)
         if target_var in self._locals:
             #already allocated 
-            llvm_var = self._locals[target_var] 
+            llvm_var = self._locals[target_var]
         else:
             #first time 
             llvm_var = self.builder.alloca(llvm_value.type, name=target_var)
@@ -306,24 +314,36 @@ class LLVMEmitter(object):
         return llvm_var
     
     def visit_If(self,node):
-        cond = self.visit(node.test)
+        #print(type(node.test), isinstance(node.test, Compare))
+        if isinstance(node.test, Compare):
+            cond = self.visit(node.test)
+        else:
+            left_value = self.visit(node.test)
+            op = "=="
+            right_value = ir.Constant(bool_type, 1)
+            cond = self._builder.icmp_signed(op, left_value, right_value) 
         
         with self._builder.if_else(cond) as (then, orelse):
             with then:
                 _ = self.visit(node.body) 
             with orelse:
                 _ = self.visit(node.orelse) 
-        
-        
+    
+    def visit_Bool(self, node):
+        print("--------- llvm bool-------------")
+        n = 0 if node.n==False else 1 
+        return ir.Constant(bool_type, n)
+        print("--------- llvm bool-------------")
+      
     def visit_Compare(self,node):
         #print("------------- llvm cond ----------------")
         #print(vars(node))
         left_value = self.visit(node.left) 
         right_value = self.visit(node.comparators[0])
         op = node.ops[0]
-        #print(left_load)
-        #print(op)
-        #print(right_load)
+        #print(left_value) 
+        #print(op) 
+        #print(right_value)
         return self._builder.icmp_signed(op, left_value, right_value) 
         #print("------------- llvm cond ----------------")
 

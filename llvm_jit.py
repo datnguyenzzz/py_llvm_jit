@@ -33,9 +33,11 @@ def type_infer(ast):
         print("num load = ", Tinfer.num_load)
         print("Func equation before inference: ", ftype)
 
-    infer_ftype = unification.apply(mgu[equal], ftype) 
+    infer_ftype = None
+    if len(mgu) != 0:
+        infer_ftype = unification.apply(mgu[equal], ftype) 
     
-    if DEBUG:
+    if DEBUG and len(mgu)>0:
         print("mgu test")
         for x in mgu[equal].keys():
             print(type(x),type(mgu[equal][x]))
@@ -48,35 +50,30 @@ def type_infer(ast):
         for a in infer_ftype.args:
             print(type(a))
         print(type(infer_ftype.ret))
-    return (infer_ftype, mgu[equal], Tinfer.relation)
+    
+    equal_equations = mgu[equal] if len(mgu)>0 else {}
+    
+    return (infer_ftype, equal_equations, Tinfer.relation)
 
 def py_llvm_jit(PARSE, LLFUNC):
     def llvm_jit(source):
         def wrapper(*args): #args of source
             parsed = parser.Parser(source) 
-            #print("---------------DEBUG------------")
-            #print(ast_parsing.dump(parsed._ast))
-            #print("---------------DEBUG------------")
             core = parsed.syntax_tree
 
             if AST:
                 print("=============== AST =====================")
-                print(ast_parsing.dump(core))
-
-            #inference node to type
-            iftype, mgu, bef_uni = type_infer(core)
-
+                print(ast_parsing.dump(parsed._ast))
+                
             if PARSE:
                 print("=============== PARSE =====================")
                 print(ast_parsing.dump(core))
+                print("===========================================")
+
+            #inference node to type
+            iftype, mgu, bef_uni = type_infer(core)      
             
             if INFER:
-                print("Before unified: ") 
-                for x in bef_uni:
-                    print("\t",x[1], " = ", x[2])
-                print("After unified: ") 
-                for k in mgu.keys():
-                    print("\t", k, " = ", mgu[k])
                 print("Func equation after inference: ", iftype)
 
             return codegen.recompile(args,core, iftype, mgu, LLFUNC)

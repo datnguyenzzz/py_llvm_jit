@@ -102,6 +102,10 @@ class Parser(Visitor):
         value = self.visit(node.value)
         return Assign(targets,value)
 
+    def visit_Str(self, node):
+        s = node.s 
+        return Str(s)
+    
     def visit_Return(self, node):
         #print("* Return *",node.value)
         value = self.visit(node.value)
@@ -157,11 +161,18 @@ class Parser(Visitor):
         keywords = node.keywords
         return Call(func,args,keywords)
     
+    def visit_NameConstant(self, node):
+        s = node.value 
+        return Bool(s)
+    
     def visit_Compare(self, node):
+        #print("-------- AST Compare ---------")
         left = self.visit(node.left)
         op = [ops[o.__class__] for o in node.ops]
         comparators = list(map(self.visit, node.comparators)) 
+        #print(comparators)
         return Compare(left, op, comparators)
+        #print("-------- AST Compare ---------")
     
     def visit_Subscript(self, node):
         value = self.visit(node.value)

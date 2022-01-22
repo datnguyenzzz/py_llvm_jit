@@ -85,13 +85,23 @@ def code_gen(ast, specialization, spec_args, spec_ret):
 def recompile(args, ast, infer_type, mgu, LLFUNC):
     type_args = list(map(arg_py_type, list(args)))
     main_func = TFunc(args = type_args, ret = TVar("$ret"))
-    unified = unification.unify(infer_type, main_func)
     
-    specialization = unification.merge(unified, mgu)
+    if infer_type != None:
+        unified = unification.unify(infer_type, main_func)
+        
+        specialization = unification.merge(unified, mgu)
 
-    spec_ret = unification.apply(specialization, TVar("$ret")) 
-    spec_args = [unification.apply(specialization, arg) for arg in type_args]
+        spec_ret = unification.apply(specialization, TVar("$ret")) 
+        spec_args = [unification.apply(specialization, arg) for arg in type_args]
+    else:
+        spec_args = type_args
+        spec_ret = main_func.args[0]
+        specialization = None
     
+    #print(spec_args)
+    #print(spec_ret)
+    #print(specialization)
+
     if determined(spec_ret) and all(map(determined, spec_args)):
         func_name = "".join([ast.name,str(hash(tuple(spec_args)))])
 

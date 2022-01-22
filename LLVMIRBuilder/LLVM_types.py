@@ -18,6 +18,10 @@ int_type = ir.IntType(32)
 float_type = ir.FloatType()
 double_type = ir.DoubleType() 
 bool_type = ir.IntType(1) 
+char = ir.IntType(8)
+
+def string_type(sz):
+    return ir.ArrayType(char, sz)
 
 void_type = ir.VoidType()
 void_ptr = pointer(ir.IntType(8))
