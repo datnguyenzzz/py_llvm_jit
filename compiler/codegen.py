@@ -71,10 +71,15 @@ def create_execution_engine():
     
     return engine
 
-def code_gen(ast, specialization, spec_args, spec_ret):
+def code_gen(ast, specialization, spec_args, spec_ret, LLFUNC):
     llvm_code = Emitter.LLVMEmitter(specialization, spec_args, spec_ret, MODULE)
     llvm_code.visit(ast)
-
+    
+    if LLFUNC:
+        print("=============== LLVM FUNC =====================")
+        print(llvm_code.function)
+        print("===============================================")
+        
     mod = llvm_passes.tuning(MODULE)
 
     engine = create_execution_engine() 
@@ -108,13 +113,10 @@ def recompile(args, ast, infer_type, mgu, LLFUNC):
         if func_name in FUNC_CACHE:
             return FUNC_CACHE[func_name](*args)
         else:
-            llfunc,engine = code_gen(ast, specialization, spec_args, spec_ret)
+            llfunc,engine = code_gen(ast, specialization, spec_args, spec_ret, LLFUNC)
             #already compile module 
             #need return compiled function from module 
             # translate to runnable function
-            if LLFUNC:
-                print("=============== LLVM FUNC =====================")
-                print(llfunc)
             wrap = jit_wrapper.JitWrapper(llfunc,engine)
             runnable_func = wrap.jit_module()
             FUNC_CACHE[func_name] = runnable_func
