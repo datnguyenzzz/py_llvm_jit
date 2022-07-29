@@ -8,6 +8,22 @@
 
 - Numpy 
 
+## **Feature supported:**
+
+- Function return Int, Double, Long
+
+- Nested For, While control flow
+
+- Nested If-Then-Else control flow
+
+- Nested Boolean operator
+
+- Basic arithmetic operation (+ , - , *, /, **, ^, !, >>, <<) with Int, Double, Long
+
+- Array with the same primitive data type Int, Double, Long
+
+- List with multiple primitive data types
+
 ## **Usage:**
 
 ```
