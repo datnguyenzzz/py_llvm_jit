@@ -13,7 +13,7 @@ Usage:
 ```
 from llvm_jit import py_llvm_jit
 
-@py_llvm_jit(PARSE=True, LLFUNC=True)
+** @py_llvm_jit(PARSE=True, LLFUNC=True) **
 def addup(a,b):
     step = 1
     c = 0
