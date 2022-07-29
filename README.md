@@ -1,19 +1,19 @@
-An implementation of Python. Translate Python to IR and compiler with LLVM JIT Compiler 
+An implementation of Python similar to PyPy, CPython,.... A library helps translate Python code to low-level language and compile it with LLVM JIT Compiler.
 
-Stack 
+Stack:
 
 - llvmlite is a lightweight binding package to the LLVM APIs, it depends on LLVM.
 
 - LLVM is the JIT compiler framework for producing executable code from various inputs.
 
-Numpy 
+- Numpy 
 
 Usage:
 
 ```
 from llvm_jit import py_llvm_jit
 
-** @py_llvm_jit(PARSE=True, LLFUNC=True) **
+@py_llvm_jit(PARSE=True, LLFUNC=True)
 def addup(a,b):
     step = 1
     c = 0
