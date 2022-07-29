@@ -1,6 +1,6 @@
-An implementation of Python similar to PyPy, CPython,.... A library helps translate Python code to low-level language and compile it with LLVM JIT Compiler.
+** An implementation of Python similar to PyPy, CPython,.... A library helps translate Python code to low-level language and compile it with LLVM JIT Compiler. **
 
-Stack:
+** Stack: **
 
 - llvmlite is a lightweight binding package to the LLVM APIs, it depends on LLVM.
 
@@ -8,7 +8,7 @@ Stack:
 
 - Numpy 
 
-Usage:
+** Usage: **
 
 ```
 from llvm_jit import py_llvm_jit
@@ -27,7 +27,7 @@ def addup(a,b):
 print(addup(1,1000000000))
 ```
 
-Arguments:
+** Arguments: **
 
 ```
 - PARSE = True/False : Print parse tree into console
@@ -36,7 +36,7 @@ Arguments:
 
 ```
 
-Results:
+** Results: **
 
 ```
 Time consumption without py_llvm_jit: 1.323523412332s
