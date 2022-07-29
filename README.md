@@ -11,7 +11,6 @@ Numpy
 Usage:
 
 ```
-
 from llvm_jit import py_llvm_jit
 
 @py_llvm_jit(PARSE=True, LLFUNC=True)
@@ -24,6 +23,8 @@ def addup(a,b):
         else:
             c = c - 1 
     return c
+    
+print(addup(1,1000000000))
 ```
 
 Arguments:
@@ -33,4 +34,14 @@ Arguments:
 
 - LLFUNC = True/False : Print LLVM intermediate representation into console
 
+```
+
+Results:
+
+```
+Time consumption without py_llvm_jit: 1.323523412332s
+Result: 1
+
+Time comsumption with py_llvm_jit: 0.000000012s
+Result: 1
 ```
